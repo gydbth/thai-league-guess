@@ -127,8 +127,8 @@ details.help summary{cursor:pointer;font-family:var(--display);font-weight:500}
   </header>
 
   <div class="status" aria-live="polite">
-    <span>รอบที่ <b id="roundNo">1</b></span>
     <span class="streak">ชนะติดกัน <b id="streakNo">0</b></span>
+    <span>สถิติสูงสุด <b id="bestNo">0</b></span>
   </div>
 
   <section class="board" aria-live="polite">
@@ -272,8 +272,8 @@ function render(){
 function updateBoard(){
   const left = MAX-guesses.length;
   const s = getStats();
-  $("roundNo").textContent = round;
   $("streakNo").textContent = s.streak;
+  $("bestNo").textContent = s.best;
   const hint = $("boardHint");
   if(done){
     $("shirtNum").textContent = secret.k;
