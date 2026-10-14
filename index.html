@@ -3,123 +3,150 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#07100b">
 <meta name="description" content="เกมทายนักเตะไทยลีก 1 ฤดูกาล 2026/27 เล่นได้ไม่จำกัด">
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 </head>
 <body>
-<title>ทายแข้งไทยลีก</title>
+<title>ทายแข้งลีกไทย</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,500;0,700;1,800&family=IBM+Plex+Sans+Thai:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,400;0,500;0,700;1,800;1,900&family=IBM+Plex+Sans+Thai:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap">
 <style>
-/* Layout: matchday board — one narrow column, guess rows stack like a team sheet, hint tiles in a 5-up grid */
+/* Layout: night match under floodlights — one narrow column on a dark striped pitch, a glowing halfway line down the middle */
 :root{
-  --bg:#eef1ec; --surface:#ffffff; --ink:#14201a; --muted:#5d6b62; --line:#d3dad4;
-  --pitch:#1f5b3a; --pitch-ink:#f3f7f2;
-  --hit:#2f8f4e; --near:#d9a521; --miss:#e3e8e3; --miss-ink:#4b574f;
+  --night:#07100b; --grass-a:#0d1d14; --grass-b:#0a1810;
+  --card:rgba(16,30,22,.78); --card-line:rgba(120,190,145,.18);
+  --ink:#e9f2ec; --muted:#8fa597; --chalk:rgba(235,245,238,.55);
+  --lime:#4fd37f; --lime-deep:#1e5a37; --lime-glow:rgba(79,211,127,.35);
+  --hit:#2f9a53; --near:#d7a425; --miss:#1d2c23; --miss-ink:#b9c8be;
+  --red:#e2453c; --red-deep:#a92a23;
   --display:"Kanit","Noto Sans Thai",system-ui,sans-serif;
   --body:"IBM Plex Sans Thai","Noto Sans Thai",system-ui,sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,monospace;
+  color-scheme:dark;
 }
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#0f1612; --surface:#18221c; --ink:#e7eee8; --muted:#94a39a; --line:#2a372f;
-  --pitch:#1d4a31; --pitch-ink:#eaf3ec;
-  --hit:#2f9a53; --near:#c99a1c; --miss:#26322b; --miss-ink:#b5c2b9; color-scheme:dark}}
-:root[data-theme="dark"]{
-  --bg:#0f1612; --surface:#18221c; --ink:#e7eee8; --muted:#94a39a; --line:#2a372f;
-  --pitch:#1d4a31; --pitch-ink:#eaf3ec;
-  --hit:#2f9a53; --near:#c99a1c; --miss:#26322b; --miss-ink:#b5c2b9; color-scheme:dark}
 *{box-sizing:border-box}
-body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;padding-inline:16px;padding-block:20px 48px}
-.wrap{max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
-header{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
-h1{font-family:var(--display);font-style:italic;font-weight:800;font-size:clamp(30px,8vw,42px);line-height:1;margin:0;letter-spacing:-.01em;text-wrap:balance}
-h1 span{color:var(--pitch)}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) h1 span{color:var(--hit)}}
-:root[data-theme="dark"] h1 span{color:var(--hit)}
-.season{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
-.modes{display:flex;gap:6px}
-.modes button,.btn{font:600 14px var(--body);border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:7px 12px;border-radius:8px;cursor:pointer}
-.modes button:disabled{opacity:.45;cursor:default}
-button:focus-visible,input:focus-visible{outline:3px solid var(--near);outline-offset:2px}
+html{background:var(--night)}
+body{
+  min-height:100vh;color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;
+  padding-inline:16px;padding-block:28px 56px;
+  background-color:var(--night);
+  background-image:
+    radial-gradient(ellipse 70% 55% at 50% 0%, rgba(120,200,150,.10), transparent 70%),
+    radial-gradient(ellipse 120% 80% at 50% 50%, transparent 40%, rgba(0,0,0,.65) 100%),
+    linear-gradient(90deg, transparent calc(50% - 7px), rgba(235,245,238,.06) calc(50% - 7px), rgba(235,245,238,.10) 50%, rgba(235,245,238,.06) calc(50% + 7px), transparent calc(50% + 7px)),
+    repeating-linear-gradient(90deg, var(--grass-a) 0 90px, var(--grass-b) 90px 180px);
+  background-attachment:fixed;
+}
+.wrap{max-width:440px;margin:0 auto;display:flex;flex-direction:column;gap:14px;position:relative}
 
-.board{background:var(--pitch);color:var(--pitch-ink);border-radius:14px;padding:16px;display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center;position:relative;overflow:hidden}
-.board::before{content:"";position:absolute;inset:auto -40px -70px auto;width:180px;height:180px;border:2px solid rgba(255,255,255,.14);border-radius:50%}
-.board::after{content:"";position:absolute;top:0;bottom:0;right:88px;border-left:2px solid rgba(255,255,255,.10)}
-.shirt{width:76px;height:76px;position:relative;z-index:1}
+header{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:4px}
+.season{font-family:var(--display);font-size:13px;color:var(--muted);letter-spacing:.02em}
+h1{font-family:var(--display);font-style:italic;font-weight:900;font-size:clamp(32px,9vw,40px);line-height:1;margin:2px 0 0;letter-spacing:-.01em;color:var(--ink)}
+h1 span{color:var(--lime);text-shadow:0 0 18px var(--lime-glow)}
+
+.giveup{display:inline-flex;align-items:center;gap:7px;font:600 14px var(--display);color:#fff;background:linear-gradient(180deg,var(--red),var(--red-deep));border:1px solid rgba(255,140,130,.35);padding:8px 13px;border-radius:9px;cursor:pointer;box-shadow:0 4px 16px rgba(226,69,60,.25)}
+.giveup svg{width:15px;height:15px}
+.giveup:hover{filter:brightness(1.08)}
+.giveup:disabled{opacity:.4;cursor:default;box-shadow:none;filter:grayscale(.4)}
+button:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid var(--near);outline-offset:2px}
+
+.status{display:flex;justify-content:space-between;align-items:center;gap:10px;font-family:var(--display);font-size:14px;color:var(--muted)}
+.status b{color:var(--ink);font-weight:500;font-variant-numeric:tabular-nums}
+.status .streak b{color:var(--lime)}
+
+.board{position:relative;overflow:hidden;border-radius:14px;padding:16px 18px;display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center;color:var(--ink);
+  background:linear-gradient(135deg,#2a6b45 0%,#1b4a30 55%,#143a25 100%);
+  border:1px solid rgba(140,220,170,.35);box-shadow:0 0 0 1px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.08)}
+.board .marks{position:absolute;inset:0;pointer-events:none}
+.board .marks svg{position:absolute;right:0;top:0;height:100%;width:auto}
+.board::after{content:"";position:absolute;right:-30px;top:-40px;width:120px;height:90px;background:radial-gradient(closest-side,rgba(255,255,255,.35),transparent);pointer-events:none}
+.shirt{width:64px;height:64px;position:relative;z-index:1}
 .shirt svg{width:100%;height:100%}
 .board-text{min-width:0;position:relative;z-index:1}
-.board-text .k{font-family:var(--mono);font-size:12px;opacity:.75;letter-spacing:.06em;text-transform:uppercase}
+.board-text .k{font-family:var(--display);font-size:13px;color:rgba(233,242,236,.75)}
 .board-text .q{font-family:var(--display);font-weight:700;font-size:22px;line-height:1.2;text-wrap:balance}
-.board-text .left{font-size:13px;opacity:.85;margin-top:4px}
+.board-text .left{font-size:13px;color:rgba(233,242,236,.8);margin-top:2px}
+.board-text .hint{display:inline-flex;align-items:center;gap:6px;margin-top:6px;font-size:13px;background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.14);border-radius:999px;padding:3px 10px}
+.board-text .hint b{font-family:var(--display);font-weight:500;color:#fff}
 
-.search{position:relative}
-.search input{width:100%;font:500 16px var(--body);padding:13px 14px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink)}
-.search input:disabled{opacity:.6}
-.list{position:absolute;left:0;right:0;top:calc(100% + 4px);background:var(--surface);border:1px solid var(--line);border-radius:10px;max-height:300px;overflow-y:auto;z-index:5;box-shadow:0 10px 30px rgba(0,0,0,.18);margin:0;padding:4px;list-style:none}
-.list li{padding:9px 10px;border-radius:7px;cursor:pointer;display:flex;justify-content:space-between;gap:10px}
-.list li[aria-selected="true"],.list li:hover{background:var(--miss)}
+.search{position:relative;margin-top:4px}
+.search label{display:block;margin-bottom:6px;font-size:13px;color:var(--muted)}
+.search input{width:100%;font:500 16px var(--body);padding:14px 16px;border-radius:11px;color:var(--ink);background:rgba(8,16,11,.85);border:1.5px solid rgba(233,242,236,.55);box-shadow:0 0 0 3px rgba(233,242,236,.06),0 0 22px rgba(233,242,236,.12)}
+.search input::placeholder{color:#6f8577}
+.search input:focus{outline:none;border-color:var(--lime);box-shadow:0 0 0 3px rgba(79,211,127,.18),0 0 24px var(--lime-glow)}
+.search input:disabled{opacity:.5}
+.list{position:absolute;left:0;right:0;top:calc(100% + 6px);background:#0f1d15;border:1px solid var(--card-line);border-radius:11px;max-height:300px;overflow-y:auto;z-index:5;box-shadow:0 14px 34px rgba(0,0,0,.55);margin:0;padding:4px;list-style:none}
+.list li{padding:9px 10px;border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.list li[aria-selected="true"],.list li:hover{background:#1c3226}
 .list .nm{font-weight:600;min-width:0}
-.list .cl{color:var(--muted);font-size:13px;white-space:nowrap}
+.list .cl{color:var(--muted);font-size:12px;white-space:nowrap;font-weight:400}
 
 .colhead,.tiles{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
-.colhead{font-size:11px;color:var(--muted);text-align:center;letter-spacing:.04em;padding-inline:2px}
+.colhead{font-family:var(--display);font-size:12px;color:var(--muted);text-align:center;padding-top:4px}
 .rows{display:flex;flex-direction:column;gap:12px}
 .row{display:flex;flex-direction:column;gap:6px}
 .row .who{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-weight:600}
-.row .who small{font-family:var(--mono);color:var(--muted);font-weight:500;font-size:12px}
-.tile{border-radius:8px;min-height:58px;padding:6px 4px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-size:12px;line-height:1.25;background:var(--miss);color:var(--miss-ink);animation:flip .35s ease both}
+.row .who small{font-family:var(--mono);color:var(--muted);font-weight:500;font-size:11px}
+.tile{border-radius:9px;min-height:58px;padding:6px 4px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-size:11.5px;line-height:1.25;background:var(--miss);color:var(--miss-ink);border:1px solid rgba(255,255,255,.05);animation:flip .35s ease both}
 .tile b{font-family:var(--display);font-weight:700;font-size:15px;line-height:1.1}
 .tile .num{font-family:var(--mono);font-size:18px;font-weight:600;font-variant-numeric:tabular-nums}
-.tile.hit{background:var(--hit);color:#fff}
+.tile.hit{background:var(--hit);color:#fff;box-shadow:0 0 14px rgba(47,154,83,.35)}
 .tile.near{background:var(--near);color:#241a00}
 .tile .flag{font-size:20px;line-height:1}
 @keyframes flip{from{transform:rotateX(90deg)}to{transform:none}}
 @media (prefers-reduced-motion: reduce){.tile{animation:none}}
 
-.end{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.end{background:var(--card);backdrop-filter:blur(6px);border:1px solid var(--card-line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:12px}
 .end h2{font-family:var(--display);font-weight:700;font-size:22px;margin:0}
-.end .reveal{font-size:15px}
 .end .actions{display:flex;gap:8px;flex-wrap:wrap}
-.btn.primary{background:var(--pitch);color:var(--pitch-ink);border-color:var(--pitch)}
-.share{font-family:var(--mono);white-space:pre;background:var(--bg);border-radius:8px;padding:10px;font-size:13px;overflow-x:auto}
+.btn{font:600 14px var(--display);border:1px solid var(--card-line);background:rgba(255,255,255,.04);color:var(--ink);padding:9px 14px;border-radius:9px;cursor:pointer}
+.btn.primary{background:linear-gradient(180deg,#38b066,#23804a);border-color:rgba(140,230,175,.4);color:#fff;box-shadow:0 4px 16px rgba(47,154,83,.3)}
+.share{font-family:var(--mono);white-space:pre;background:rgba(0,0,0,.35);border-radius:9px;padding:10px;font-size:13px;overflow-x:auto}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center}
 .stats div{display:flex;flex-direction:column}
 .stats b{font-family:var(--display);font-size:24px;font-variant-numeric:tabular-nums}
 .stats span{font-size:12px;color:var(--muted)}
 
-details.help{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
-details.help summary{cursor:pointer;font-weight:600}
-.legend{display:flex;flex-direction:column;gap:6px;margin-top:10px;font-size:14px}
+details.help{background:var(--card);backdrop-filter:blur(6px);border:1px solid var(--card-line);border-radius:12px;padding:13px 16px}
+details.help summary{cursor:pointer;font-family:var(--display);font-weight:500}
+.legend{display:flex;flex-direction:column;gap:7px;margin-top:10px;font-size:14px;color:#cfdcd3}
 .legend i{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:6px}
-.note{font-size:12px;color:var(--muted);line-height:1.6}
-.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 14px;border-radius:8px;font-size:14px}
+.note{font-size:12px;color:var(--muted);line-height:1.7;margin:4px 0 0}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--night);padding:9px 14px;border-radius:9px;font-size:14px;z-index:10}
 </style>
 
 <div class="wrap">
   <header>
     <div>
       <div class="season">ไทยลีก 1 · ฤดูกาล 2026/27</div>
-      <h1>ทาย<span>แข้ง</span>ไทยลีก</h1>
+      <h1>ทาย<span>แข้ง</span>ลีกไทย</h1>
     </div>
-    <div class="modes">
-      <button id="giveUp">ยอมแพ้ ดูเฉลย</button>
-    </div>
+    <button class="giveup" id="giveUp"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 15V1.5M3 2h9l-2 3 2 3H3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></svg>ยอมแพ้ ดูเฉลย</button>
   </header>
 
+  <div class="status" aria-live="polite">
+    <span>รอบที่ <b id="roundNo">1</b></span>
+    <span class="streak">ชนะติดกัน <b id="streakNo">0</b></span>
+  </div>
+
   <section class="board" aria-live="polite">
+    <div class="marks" aria-hidden="true">
+      <svg viewBox="0 0 120 100" preserveAspectRatio="xMaxYMid meet"><g fill="none" stroke="rgba(255,255,255,.16)" stroke-width="1.4"><path d="M120 22 H92 V78 H120"/><path d="M120 38 H108 V62 H120"/><path d="M92 36 A16 16 0 0 0 92 64"/><circle cx="20" cy="50" r="34"/></g></svg>
+    </div>
     <div class="shirt" aria-hidden="true">
-      <svg viewBox="0 0 100 100"><path d="M34 12 L20 18 L6 34 L18 46 L26 40 L26 90 L74 90 L74 40 L82 46 L94 34 L80 18 L66 12 Q50 24 34 12 Z" fill="rgba(255,255,255,.12)" stroke="rgba(255,255,255,.65)" stroke-width="2.5" stroke-linejoin="round"/><text x="50" y="72" text-anchor="middle" font-family="Kanit, sans-serif" font-weight="700" font-size="34" fill="currentColor" id="shirtNum">?</text></svg>
+      <svg viewBox="0 0 100 100"><path d="M34 12 L20 18 L6 34 L18 46 L26 40 L26 90 L74 90 L74 40 L82 46 L94 34 L80 18 L66 12 Q50 24 34 12 Z" fill="none" stroke="rgba(255,255,255,.85)" stroke-width="3" stroke-linejoin="round"/><text x="50" y="72" text-anchor="middle" font-family="Kanit, sans-serif" font-weight="700" font-size="32" fill="#fff" id="shirtNum">?</text></svg>
     </div>
     <div class="board-text">
-      <div class="k" id="boardKicker">นักเตะปริศนา</div>
       <div class="q" id="boardQ">นักเตะคนนี้คือใคร?</div>
+      <div class="hint" id="boardHint"></div>
       <div class="left" id="boardLeft"></div>
     </div>
   </section>
 
   <div class="search">
-    <label for="guess" class="note" style="display:block;margin-bottom:4px">พิมพ์ชื่อนักเตะหรือชื่อสโมสร ได้ทั้งภาษาไทยและอังกฤษ</label>
+    <label for="guess">พิมพ์ชื่อนักเตะหรือชื่อสโมสร ได้ทั้งภาษาไทยและอังกฤษ</label>
     <input id="guess" type="text" autocomplete="off" placeholder="เช่น ธีรศิลป์, ชนาธิป, ศุภชัย" role="combobox" aria-expanded="false" aria-controls="sug" aria-autocomplete="list">
     <ul class="list" id="sug" role="listbox" hidden></ul>
   </div>
@@ -132,10 +159,10 @@ details.help summary{cursor:pointer;font-weight:600}
   <details class="help">
     <summary>วิธีเล่น</summary>
     <div class="legend">
-      <div>ทายให้ถูกภายใน 8 ครั้ง แต่ละครั้งจะได้คำใบ้ 5 ช่อง</div>
+      <div>ทายให้ถูกภายใน 8 ครั้ง เริ่มรอบจะได้คำใบ้แรกฟรี 1 ข้อ แล้วทุกครั้งที่ทายจะได้คำใบ้ 5 ช่อง</div>
       <div><i style="background:var(--hit)"></i>เขียว: ตรงกับนักเตะปริศนา</div>
       <div><i style="background:var(--near)"></i>เหลือง: ใกล้แล้ว สโมสรอยู่จังหวัดเดียวกัน · ตำแหน่งติดกัน · สัญชาติทวีปเดียวกัน · เบอร์ห่างไม่เกิน 3</div>
-      <div><i style="background:var(--miss);border:1px solid var(--line)"></i>เทา: ไม่ตรง ลูกศร ↑ ↓ บอกว่าเบอร์เสื้อมากหรือน้อยกว่า</div>
+      <div><i style="background:var(--miss);border:1px solid var(--card-line)"></i>เทา: ไม่ตรง ลูกศร ↑ ↓ บอกว่าเบอร์เสื้อมากหรือน้อยกว่า</div>
       <div>ทายจบแล้วกด "เล่นคนต่อไป" หรือ Enter เพื่อสุ่มนักเตะคนใหม่ เล่นได้ไม่จำกัด</div>
     </div>
   </details>
@@ -245,14 +272,19 @@ function render(){
 function updateBoard(){
   const left = MAX-guesses.length;
   const s = getStats();
-  $("boardKicker").textContent = `รอบที่ ${round} · ชนะติดกัน ${s.streak}`;
+  $("roundNo").textContent = round;
+  $("streakNo").textContent = s.streak;
+  const hint = $("boardHint");
   if(done){
     $("shirtNum").textContent = secret.k;
     $("boardQ").textContent = disp(secret);
+    hint.hidden = true;
     $("boardLeft").textContent = `${CLUBS[secret.c].th} · ${POS[secret.p].th} · ${(NAT[secret.t]||[secret.t])[0]}`;
   } else {
     $("shirtNum").textContent = "?";
     $("boardQ").textContent = "นักเตะคนนี้คือใคร?";
+    hint.hidden = false;
+    hint.innerHTML = firstHint(secret);
     $("boardLeft").textContent = `เหลือโอกาสทายอีก ${left} ครั้ง`;
   }
 }
@@ -288,7 +320,7 @@ function shareText(){
   const won = guesses.some(g=>g.id===secret.id);
   const sq={hit:"🟩",near:"🟨",miss:"⬜"};
   const lines = guesses.map(g=>{const r=compare(g,secret);return [r.club,r.reg,r.pos,r.nat,r.num].map(x=>sq[x]).join("");});
-  return `ทายแข้งไทยลีก ${won?guesses.length:"X"}/${MAX}\n${lines.join("\n")}`;
+  return `ทายแข้งลีกไทย ${won?guesses.length:"X"}/${MAX}\n${lines.join("\n")}`;
 }
 
 function showEnd(){
@@ -340,7 +372,19 @@ input.addEventListener("keydown",e=>{
 sug.addEventListener("mousedown",e=>{const li=e.target.closest("li[data-i]");if(li){e.preventDefault();submit(matches[+li.dataset.i]);}});
 document.addEventListener("click",e=>{if(!e.target.closest(".search"))closeList();});
 
+// One free clue per round, picked at random and fixed for the round
+let hintKind = 0;
+function firstHint(p){
+  const nat = NAT[p.t]||[p.t];
+  const kinds = [
+    ()=>`คำใบ้แรก: เล่นตำแหน่ง <b>${POS[p.p].th}</b>`,
+    ()=>`คำใบ้แรก: สัญชาติ <b>${flag(p.t)} ${nat[0]}</b>`,
+    ()=>`คำใบ้แรก: สโมสรอยู่ภาค <b>${CLUBS[p.c].reg}</b>`
+  ];
+  return kinds[hintKind % kinds.length]();
+}
 function newRound(){
+  hintKind = Math.floor(Math.random()*3);
   // avoid repeating any of the last 50 secrets
   let p; do { p = POOL[Math.floor(Math.random()*POOL.length)]; } while(recent.includes(p.id) && recent.length < POOL.length);
   recent.push(p.id); if(recent.length>50) recent.shift();
