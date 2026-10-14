@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="เกมทายนักเตะไทยลีก 1 ฤดูกาล 2026/27 เล่นได้ไม่จำกัด">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>ทายแข้งไทยลีก</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,500;0,700;1,800&family=IBM+Plex+Sans+Thai:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: matchday board — one narrow column, guess rows stack like a team sheet, hint tiles in a 5-up grid */
+:root{
+  --bg:#eef1ec; --surface:#ffffff; --ink:#14201a; --muted:#5d6b62; --line:#d3dad4;
+  --pitch:#1f5b3a; --pitch-ink:#f3f7f2;
+  --hit:#2f8f4e; --near:#d9a521; --miss:#e3e8e3; --miss-ink:#4b574f;
+  --display:"Kanit","Noto Sans Thai",system-ui,sans-serif;
+  --body:"IBM Plex Sans Thai","Noto Sans Thai",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1612; --surface:#18221c; --ink:#e7eee8; --muted:#94a39a; --line:#2a372f;
+  --pitch:#1d4a31; --pitch-ink:#eaf3ec;
+  --hit:#2f9a53; --near:#c99a1c; --miss:#26322b; --miss-ink:#b5c2b9; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1612; --surface:#18221c; --ink:#e7eee8; --muted:#94a39a; --line:#2a372f;
+  --pitch:#1d4a31; --pitch-ink:#eaf3ec;
+  --hit:#2f9a53; --near:#c99a1c; --miss:#26322b; --miss-ink:#b5c2b9; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;padding-inline:16px;padding-block:20px 48px}
+.wrap{max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+header{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
+h1{font-family:var(--display);font-style:italic;font-weight:800;font-size:clamp(30px,8vw,42px);line-height:1;margin:0;letter-spacing:-.01em;text-wrap:balance}
+h1 span{color:var(--pitch)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) h1 span{color:var(--hit)}}
+:root[data-theme="dark"] h1 span{color:var(--hit)}
+.season{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+.modes{display:flex;gap:6px}
+.modes button,.btn{font:600 14px var(--body);border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:7px 12px;border-radius:8px;cursor:pointer}
+.modes button:disabled{opacity:.45;cursor:default}
+button:focus-visible,input:focus-visible{outline:3px solid var(--near);outline-offset:2px}
+
+.board{background:var(--pitch);color:var(--pitch-ink);border-radius:14px;padding:16px;display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center;position:relative;overflow:hidden}
+.board::before{content:"";position:absolute;inset:auto -40px -70px auto;width:180px;height:180px;border:2px solid rgba(255,255,255,.14);border-radius:50%}
+.board::after{content:"";position:absolute;top:0;bottom:0;right:88px;border-left:2px solid rgba(255,255,255,.10)}
+.shirt{width:76px;height:76px;position:relative;z-index:1}
+.shirt svg{width:100%;height:100%}
+.board-text{min-width:0;position:relative;z-index:1}
+.board-text .k{font-family:var(--mono);font-size:12px;opacity:.75;letter-spacing:.06em;text-transform:uppercase}
+.board-text .q{font-family:var(--display);font-weight:700;font-size:22px;line-height:1.2;text-wrap:balance}
+.board-text .left{font-size:13px;opacity:.85;margin-top:4px}
+
+.search{position:relative}
+.search input{width:100%;font:500 16px var(--body);padding:13px 14px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink)}
+.search input:disabled{opacity:.6}
+.list{position:absolute;left:0;right:0;top:calc(100% + 4px);background:var(--surface);border:1px solid var(--line);border-radius:10px;max-height:300px;overflow-y:auto;z-index:5;box-shadow:0 10px 30px rgba(0,0,0,.18);margin:0;padding:4px;list-style:none}
+.list li{padding:9px 10px;border-radius:7px;cursor:pointer;display:flex;justify-content:space-between;gap:10px}
+.list li[aria-selected="true"],.list li:hover{background:var(--miss)}
+.list .nm{font-weight:600;min-width:0}
+.list .cl{color:var(--muted);font-size:13px;white-space:nowrap}
+
+.colhead,.tiles{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.colhead{font-size:11px;color:var(--muted);text-align:center;letter-spacing:.04em;padding-inline:2px}
+.rows{display:flex;flex-direction:column;gap:12px}
+.row{display:flex;flex-direction:column;gap:6px}
+.row .who{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-weight:600}
+.row .who small{font-family:var(--mono);color:var(--muted);font-weight:500;font-size:12px}
+.tile{border-radius:8px;min-height:58px;padding:6px 4px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-size:12px;line-height:1.25;background:var(--miss);color:var(--miss-ink);animation:flip .35s ease both}
+.tile b{font-family:var(--display);font-weight:700;font-size:15px;line-height:1.1}
+.tile .num{font-family:var(--mono);font-size:18px;font-weight:600;font-variant-numeric:tabular-nums}
+.tile.hit{background:var(--hit);color:#fff}
+.tile.near{background:var(--near);color:#241a00}
+.tile .flag{font-size:20px;line-height:1}
+@keyframes flip{from{transform:rotateX(90deg)}to{transform:none}}
+@media (prefers-reduced-motion: reduce){.tile{animation:none}}
+
+.end{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.end h2{font-family:var(--display);font-weight:700;font-size:22px;margin:0}
+.end .reveal{font-size:15px}
+.end .actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn.primary{background:var(--pitch);color:var(--pitch-ink);border-color:var(--pitch)}
+.share{font-family:var(--mono);white-space:pre;background:var(--bg);border-radius:8px;padding:10px;font-size:13px;overflow-x:auto}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center}
+.stats div{display:flex;flex-direction:column}
+.stats b{font-family:var(--display);font-size:24px;font-variant-numeric:tabular-nums}
+.stats span{font-size:12px;color:var(--muted)}
+
+details.help{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+details.help summary{cursor:pointer;font-weight:600}
+.legend{display:flex;flex-direction:column;gap:6px;margin-top:10px;font-size:14px}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:6px}
+.note{font-size:12px;color:var(--muted);line-height:1.6}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 14px;border-radius:8px;font-size:14px}
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <div class="season">ไทยลีก 1 · ฤดูกาล 2026/27</div>
+      <h1>ทาย<span>แข้ง</span>ไทยลีก</h1>
+    </div>
+    <div class="modes">
+      <button id="giveUp">ยอมแพ้ ดูเฉลย</button>
+    </div>
+  </header>
+
+  <section class="board" aria-live="polite">
+    <div class="shirt" aria-hidden="true">
+      <svg viewBox="0 0 100 100"><path d="M34 12 L20 18 L6 34 L18 46 L26 40 L26 90 L74 90 L74 40 L82 46 L94 34 L80 18 L66 12 Q50 24 34 12 Z" fill="rgba(255,255,255,.12)" stroke="rgba(255,255,255,.65)" stroke-width="2.5" stroke-linejoin="round"/><text x="50" y="72" text-anchor="middle" font-family="Kanit, sans-serif" font-weight="700" font-size="34" fill="currentColor" id="shirtNum">?</text></svg>
+    </div>
+    <div class="board-text">
+      <div class="k" id="boardKicker">นักเตะปริศนา</div>
+      <div class="q" id="boardQ">นักเตะคนนี้คือใคร?</div>
+      <div class="left" id="boardLeft"></div>
+    </div>
+  </section>
+
+  <div class="search">
+    <label for="guess" class="note" style="display:block;margin-bottom:4px">พิมพ์ชื่อนักเตะหรือชื่อสโมสร ได้ทั้งภาษาไทยและอังกฤษ</label>
+    <input id="guess" type="text" autocomplete="off" placeholder="เช่น ธีรศิลป์, ชนาธิป, ศุภชัย" role="combobox" aria-expanded="false" aria-controls="sug" aria-autocomplete="list">
+    <ul class="list" id="sug" role="listbox" hidden></ul>
+  </div>
+
+  <div class="colhead" aria-hidden="true"><div>สโมสร</div><div>ภาค</div><div>ตำแหน่ง</div><div>สัญชาติ</div><div>เบอร์</div></div>
+  <div class="rows" id="rows"></div>
+
+  <section class="end" id="end" hidden></section>
+
+  <details class="help">
+    <summary>วิธีเล่น</summary>
+    <div class="legend">
+      <div>ทายให้ถูกภายใน 8 ครั้ง แต่ละครั้งจะได้คำใบ้ 5 ช่อง</div>
+      <div><i style="background:var(--hit)"></i>เขียว: ตรงกับนักเตะปริศนา</div>
+      <div><i style="background:var(--near)"></i>เหลือง: ใกล้แล้ว สโมสรอยู่จังหวัดเดียวกัน · ตำแหน่งติดกัน · สัญชาติทวีปเดียวกัน · เบอร์ห่างไม่เกิน 3</div>
+      <div><i style="background:var(--miss);border:1px solid var(--line)"></i>เทา: ไม่ตรง ลูกศร ↑ ↓ บอกว่าเบอร์เสื้อมากหรือน้อยกว่า</div>
+      <div>ทายจบแล้วกด "เล่นคนต่อไป" หรือ Enter เพื่อสุ่มนักเตะคนใหม่ เล่นได้ไม่จำกัด</div>
+    </div>
+  </details>
+  <p class="note" id="dataNote"></p>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+const PLAYERS = [{"n":"Sasalak Haiprakhon","c":"BRU","p":"DF","t":"THA","k":2,"th":"ศศลักษณ์ ไหประโคน"},{"n":"Pansa Hemviboon","c":"BRU","p":"DF","t":"THA","k":3,"th":"พรรษา เหมวิบูลย์"},{"n":"Nathan Pelae","c":"BRU","p":"DF","t":"BRA","k":5,"th":"นาธาน เปเล"},{"n":"Curtis Good","c":"BRU","p":"DF","t":"AUS","k":6,"th":"เคอร์ติส กู๊ด"},{"n":"Guilherme Bissoli","c":"BRU","p":"FW","t":"BRA","k":7,"th":"กีแยร์เม บิสโซลี"},{"n":"Paulinho","c":"BRU","p":"MF","t":"BRA","k":8,"th":"เปาลินโญ"},{"n":"Supachai Chaided","c":"BRU","p":"FW","t":"THA","k":9,"th":"ศุภชัย ใจเด็ด"},{"n":"Sebas Moyano","c":"BRU","p":"MF","t":"ESP","k":10,"th":"เซบาส โมยาโน"},{"n":"Anan Yodsangwal","c":"BRU","p":"MF","t":"THA","k":11,"th":"อนันต์ ยอดสังวาลย์"},{"n":"Neil Etheridge","c":"BRU","p":"GK","t":"PHI","k":13,"th":"นีล เอเธอริดจ์"},{"n":"Narubadin Weerawatnodom","c":"BRU","p":"DF","t":"THA","k":15,"th":"นรุบดินทร์ วีรวัฒโนดม"},{"n":"Kenny Dougall","c":"BRU","p":"MF","t":"AUS","k":16,"th":"เคนนี ดูกัลล์"},{"n":"Vukan Savićević","c":"BRU","p":"MF","t":"MNE","k":18,"th":"วูคาน ซาวิเชวิช"},{"n":"Kingsley Schindler","c":"BRU","p":"MF","t":"GHA","k":19,"th":"คิงส์ลีย์ ชินด์เลอร์"},{"n":"Iklas Sanron","c":"BRU","p":"MF","t":"THA","k":21,"th":"อิคลาส แสนร่อน"},{"n":"Marc Navarro","c":"BRU","p":"DF","t":"ESP","k":22,"th":"มาร์ก นาวาร์โร"},{"n":"Goran Čaušić","c":"BRU","p":"MF","t":"SRB","k":23,"th":"โกรัน เชาซิช"},{"n":"Uroš Radaković","c":"BRU","p":"DF","t":"SRB","k":26,"th":"อูรอส ราดาโควิช"},{"n":"Phitiwat Sukjitthammakul","c":"BRU","p":"MF","t":"THA","k":27,"th":"พิทิวัตต์ สุขจิตธรรมกุล"},{"n":"Rubén Sánchez","c":"BRU","p":"FW","t":"ESP","k":28,"th":"รูเบน ซานเชซ"},{"n":"Korraphat Nareechan","c":"BRU","p":"GK","t":"THA","k":29,"th":"กรภัทร์ นารีจันทร์"},{"n":"Stefan Schimmer","c":"BRU","p":"FW","t":"GER","k":30,"th":"สเตฟาน ชิมเมอร์"},{"n":"Wanderson Caju","c":"BRU","p":"DF","t":"BRA","k":31,"th":"วันเดอร์สัน กาจู"},{"n":"Thanakrit Chotmuangpak","c":"BRU","p":"MF","t":"THA","k":33,"th":"ธนกฤต โชติเมืองปัก"},{"n":"Chatchai Budprom","c":"BRU","p":"GK","t":"THA","k":34,"th":"ฉัตรชัย บุตรพรม"},{"n":"Darlan Mendes","c":"BRU","p":"MF","t":"BRA","k":37,"th":"ดาร์ลาน เมนเดส"},{"n":"Jakkapan Praisuwan","c":"BRU","p":"DF","t":"THA","k":39,"th":"จักรพันธ์ ไพรสุวรรณ"},{"n":"Eduardo Mancha","c":"BRU","p":"DF","t":"BRA","k":40,"th":"เอดูอาร์โด มานชา"},{"n":"Prapot Chongcharoen","c":"BRU","p":"GK","t":"THA","k":45,"th":"ประพจน์ จงเจริญ"},{"n":"Nathakorn Ratthanasuwan","c":"BRU","p":"FW","t":"THA","k":54,"th":"ณฐกร รัตนสุวรรณ"},{"n":"Theerathon Bunmathan","c":"BRU","p":"DF","t":"THA","k":55,"th":"ธีราทร บุญมาทัน"},{"n":"Shinnaphat Leeaoh","c":"BRU","p":"DF","t":"THA","k":75,"th":"ชินภัทร์ ลีเอาะ"},{"n":"Alexandru Tudorie","c":"BRU","p":"FW","t":"ROU","k":99,"th":"อเล็กซานดรู ทูโดรี"},{"n":"Patiwat Khammai","c":"BKU","p":"GK","t":"THA","k":1,"th":"ปฏิวัติ คำไหม"},{"n":"Everton","c":"BKU","p":"DF","t":"BRA","k":3,"th":"เอเวอร์ตัน"},{"n":"Weerathep Pomphan","c":"BKU","p":"MF","t":"THA","k":4,"th":"วีระเทพ ป้อมพันธุ์"},{"n":"Philipe Maia","c":"BKU","p":"DF","t":"BRA","k":5,"th":"ฟิลิเป ไมอา"},{"n":"John-Patrick Strauß","c":"BKU","p":"MF","t":"PHI","k":6,"th":"จอห์น-แพทริก สเตราส์"},{"n":"Kakana Khamyok","c":"BKU","p":"MF","t":"THA","k":7,"th":"คาคานา คำยก"},{"n":"Thitiphan Puangchan","c":"BKU","p":"MF","t":"THA","k":8,"th":"ธิติพันธ์ พ่วงจันทร์"},{"n":"Teerasil Dangda","c":"BKU","p":"FW","t":"THA","k":10,"th":"ธีรศิลป์ แดงดา"},{"n":"Muhsen Al-Ghassani","c":"BKU","p":"FW","t":"OMA","k":11,"th":"มูห์เซน อัล-กัสซานี"},{"n":"Wisarut Imura","c":"BKU","p":"MF","t":"THA","k":17,"th":"วิศรุต อิมุระ"},{"n":"Yonatan Cohen","c":"BKU","p":"MF","t":"ISR","k":18,"th":"โยนาทาน โคเฮน"},{"n":"Willian Popp","c":"BKU","p":"FW","t":"BRA","k":19,"th":"วิลเลียน ป็อปป์"},{"n":"Marc Cardona","c":"BKU","p":"FW","t":"ESP","k":20,"th":"มาร์ก การ์โดนา"},{"n":"Anthony Caceres","c":"BKU","p":"MF","t":"AUS","k":21,"th":"แอนโทนี กาเซเรส"},{"n":"Wichan Inaram","c":"BKU","p":"DF","t":"THA","k":22,"th":"วิชาญ อินอร่าม"},{"n":"Lee Ki-je","c":"BKU","p":"DF","t":"KOR","k":23,"th":"อี คี-เจ"},{"n":"Wanchai Jarunongkran","c":"BKU","p":"DF","t":"THA","k":24,"th":"วันชัย จารุนงคราญ"},{"n":"Suphan Thongsong","c":"BKU","p":"DF","t":"THA","k":26,"th":"สุพรรณ ทองสงค์"},{"n":"James Beresford","c":"BKU","p":"DF","t":"THA","k":27,"th":"เจมส์ เบเรสฟอร์ด"},{"n":"Phuwadol Pholsongkram","c":"BKU","p":"GK","t":"THA","k":29,"th":"ภูวดล พลสงคราม"},{"n":"Kritsada Nontharat","c":"BKU","p":"MF","t":"THA","k":35,"th":"กฤษดา นนทราช"},{"n":"Picha Autra","c":"BKU","p":"MF","t":"THA","k":37,"th":"พิชา อู๋ตรา"},{"n":"Chinnapong Raksri","c":"BKU","p":"GK","t":"THA","k":38,"th":"ชินพงศ์ รักษ์ศรี"},{"n":"Pokklaw Anan","c":"BKU","p":"MF","t":"THA","k":39,"th":"ปกเกล้า อนันต์"},{"n":"Surachai Booncharee","c":"BKU","p":"DF","t":"THA","k":43,"th":"สุรชัย บุญชารี"},{"n":"Narakorn Kangkratok","c":"BKU","p":"FW","t":"THA","k":44,"th":"นรากร กังกระโทก"},{"n":"Nontapat Ploymee","c":"BKU","p":"DF","t":"THA","k":53,"th":"นนทพัทธ์ พลอยมี"},{"n":"Achita Nawathit","c":"BKU","p":"FW","t":"THA","k":54,"th":"อชิตะ นาวาทิต"},{"n":"Thanawat Deelert","c":"BKU","p":"FW","t":"THA","k":55,"th":"ธนวัฒน์ ดีเลิศ"},{"n":"Krit Klangpan","c":"BKU","p":"MF","t":"THA","k":56,"th":"กฤต กลางพันธ์"},{"n":"Aekkarat Sansuwan","c":"BKU","p":"MF","t":"THA","k":57,"th":"เอกราช แสนสุวรรณ"},{"n":"Pachara Wangsawat","c":"BKU","p":"MF","t":"THA","k":58,"th":"พชร วังสวัสดิ์"},{"n":"Arthur Moura","c":"BKU","p":"FW","t":"BRA","k":70,"th":"อาร์เธอร์ โมรา"},{"n":"Supanut Sudathip","c":"BKU","p":"GK","t":"THA","k":88,"th":"ศุภณัฏฐ์ สุดาทิพย์"},{"n":"Felipe Santos","c":"BKU","p":"FW","t":"BRA","k":97,"th":"เฟลิเป ซานโตส"},{"n":"Sanchai Nontasila","c":"BGP","p":"DF","t":"THA","k":2,"th":"สัญชัย นนทศิลา"},{"n":"Kritsada Kaman","c":"BGP","p":"MF","t":"THA","k":5,"th":"กฤษดา กาแมน"},{"n":"Sarach Yooyen","c":"BGP","p":"MF","t":"THA","k":6,"th":"สารัช อยู่เย็น"},{"n":"Raniel","c":"BGP","p":"FW","t":"BRA","k":7,"th":"รานิเอล"},{"n":"Surachat Sareepim","c":"BGP","p":"FW","t":"THA","k":9,"th":"สุรชาติ สารีพิมพ์"},{"n":"Patrik Gustavsson","c":"BGP","p":"FW","t":"THA","k":11,"th":"ปาทริก กุสตาฟส์สัน"},{"n":"Tomoyuki Doi","c":"BGP","p":"FW","t":"JPN","k":14,"th":"โทโมยูกิ โดอิ"},{"n":"Chanathip Songkrasin","c":"BGP","p":"MF","t":"THA","k":18,"th":"ชนาธิป สรงกระสินธ์"},{"n":"Pichaya Chaiwarangkun","c":"BGP","p":"FW","t":"THA","k":19,"th":"พิชญะ ชัยวรางกูร"},{"n":"Nathan James","c":"BGP","p":"DF","t":"THA","k":22,"th":"นาธาน เจมส์"},{"n":"Pongrawit Jantawong","c":"BGP","p":"MF","t":"THA","k":27,"th":"พงศ์รวิช จันทวงษ์"},{"n":"Saranon Anuin","c":"BGP","p":"GK","t":"THA","k":28,"th":"ศรานนท์ อนุอินทร์"},{"n":"Itthimon Tippanet","c":"BGP","p":"MF","t":"THA","k":30,"th":"อิทธิมนต์ ทิพเนตร"},{"n":"Nalawich Intacharoen","c":"BGP","p":"GK","t":"THA","k":49,"th":"นลวิช อินทเจริญ"},{"n":"Chanasorn Kaewyos","c":"BGP","p":"GK","t":"THA","k":66,"th":"ชนสรณ์ แก้วยศ"},{"n":"Siwakorn Ponsan","c":"BGP","p":"FW","t":"THA","k":77,"th":"ศิวกร พลสัน"},{"n":"Waris Choolthong","c":"BGP","p":"DF","t":"THA","k":81,"th":"วริศ ชูลทอง"},{"n":"Chanapach Buaphan","c":"BGP","p":"DF","t":"THA","k":89,"th":"ชนพัฒน์ บัวพันธ์"},{"n":"Pisan Dorkmaikaew","c":"BGP","p":"GK","t":"THA","k":93,"th":"พิศาล ดอกไม้แก้ว"},{"n":"Witthawat Phraothaisong","c":"BGP","p":"FW","t":"THA","k":97,"th":"วิทวัส พราวไทสง"},{"n":"Ikhsan Fandi","c":"BGP","p":"FW","t":"SGP","k":99,"th":"อิคซาน ฟานดี"},{"n":"Lucas Andersen","c":"BGP","p":"MF","t":"DEN","k":null,"th":"ลูคัส แอนเดอร์เซน"},{"n":"Pawee Tanthatemee","c":"BGP","p":"DF","t":"THA","k":null,"th":"ปวีร์ ตัณฑะเตมีย์"},{"n":"Leon James","c":"BGP","p":"MF","t":"THA","k":null,"th":"ลีออน เจมส์"},{"n":"Chanon Tamma","c":"BGP","p":"DF","t":"THA","k":null,"th":"ชานนท์ ธรรมมา"},{"n":"Takahiro Yanagi","c":"BGP","p":"DF","t":"JPN","k":null,"th":"ทากาฮิโระ ยานางิ"},{"n":"Marko Nikolić","c":"BGP","p":"DF","t":"SRB","k":null,"th":"มาร์โก นิโคลิช"},{"n":"João Magno","c":"BGP","p":"FW","t":"BRA","k":null,"th":"ชูเอา มักโน"},{"n":"Ryan Edwards","c":"BGP","p":"MF","t":"AUS","k":null,"th":"ไรอัน เอ็ดเวิร์ดส์"},{"n":"Anthony Belmonte","c":"BGP","p":"MF","t":"FRA","k":null,"th":"อองโตนี เบลมงต์"},{"n":"Saharat Pongsuwan","c":"BGP","p":"DF","t":"THA","k":null,"th":"สหรัฐ พงษ์สุวรรณ"},{"n":"Edin Osmanović","c":"BGP","p":"DF","t":"LUX","k":null,"th":"เอดิน ออสมาโนวิช"},{"n":"Elias Dolah","c":"BGP","p":"DF","t":"THA","k":null,"th":"อีเลียส โดเลาะ"},{"n":"Somporn Yos","c":"POR","p":"GK","t":"THA","k":1,"th":"สมพร ยศ"},{"n":"Asnawi Mangkualam","c":"POR","p":"DF","t":"IDN","k":3,"th":"อัสนาวี มังกูอาลัม"},{"n":"Suphanan Bureerat","c":"POR","p":"DF","t":"THA","k":4,"th":"ศุภณัฐ บุรีรัตน์"},{"n":"Peeradol Chamrasamee","c":"POR","p":"MF","t":"THA","k":5,"th":"พีรดนย์ ช่ำรัศมี"},{"n":"Issam Al-Sabhi","c":"POR","p":"FW","t":"OMA","k":7,"th":"อิสซาม อัล-ซับฮี"},{"n":"Tanaboon Kesarat","c":"POR","p":"MF","t":"THA","k":8,"th":"ธนบูรณ์ เกษารัตน์"},{"n":"Ruan Ribeiro","c":"POR","p":"FW","t":"BRA","k":9,"th":"รวน ริเบโร"},{"n":"Bordin Phala","c":"POR","p":"MF","t":"THA","k":10,"th":"บดินทร์ ผาลา"},{"n":"Bruno Moreira","c":"POR","p":"MF","t":"BRA","k":11,"th":"บรูโน โมเรรา"},{"n":"Kaká Mendes","c":"POR","p":"MF","t":"BRA","k":12,"th":"กาก้า เมนเดส"},{"n":"Matheus Lins","c":"POR","p":"DF","t":"BRA","k":13,"th":"มาเธอุส ลินส์"},{"n":"Teerasak Poeiphimai","c":"POR","p":"FW","t":"THA","k":14,"th":"ธีรศักดิ์ เผยพิมาย"},{"n":"Manuel Bihr","c":"POR","p":"DF","t":"THA","k":15,"th":"มานูเอล เบียร์"},{"n":"Chinnawat Wongchai","c":"POR","p":"DF","t":"THA","k":16,"th":"ชินวัตร วงศ์ไชย"},{"n":"Seksan Ratree","c":"POR","p":"MF","t":"THA","k":17,"th":"เสกสรร ราตรี"},{"n":"Jude Soonsup-Bell","c":"POR","p":"FW","t":"THA","k":18,"th":"จู๊ด ศุภสุข-เบลล์"},{"n":"Sivakorn Tiatrakul","c":"POR","p":"MF","t":"THA","k":21,"th":"ศิวกร เตียตระกูล"},{"n":"Rebin Sulaka","c":"POR","p":"DF","t":"IRQ","k":22,"th":"เรบิน ซูลากา"},{"n":"Hugo Boutsingkham","c":"POR","p":"DF","t":"THA","k":23,"th":"อูโก บุตรสิงห์คำ"},{"n":"Jakkaphan Kaewprom","c":"POR","p":"MF","t":"THA","k":24,"th":"จักรพันธ์ แก้วพรม"},{"n":"Lucas Tocantins","c":"POR","p":"MF","t":"BRA","k":27,"th":"ลูกัส โตกันตินส์"},{"n":"Tanapat Hongkhaio","c":"POR","p":"MF","t":"THA","k":30,"th":"ธนภัทร หงษ์เขียว"},{"n":"Noboru Shimura","c":"POR","p":"DF","t":"JPN","k":33,"th":"โนโบรุ ชิมูระ"},{"n":"Nitipong Selanon","c":"POR","p":"DF","t":"THA","k":34,"th":"นิติพงษ์ เสลานนท์"},{"n":"Sarawut Konglarp","c":"POR","p":"GK","t":"THA","k":35,"th":"สราวุธ คงลาภ"},{"n":"Peerawat Akkratum","c":"POR","p":"DF","t":"THA","k":36,"th":"พีรวัส อัครธรรม"},{"n":"Natthakit Phosri","c":"POR","p":"FW","t":"THA","k":38,"th":"ณัฐกิตติ์ โพธิ์ศรี"},{"n":"Rangsiman Khemmung","c":"POR","p":"GK","t":"THA","k":40,"th":"รังสิมันต์ เข็มมุ่ง"},{"n":"Worachit Kanitsribampen","c":"POR","p":"MF","t":"THA","k":44,"th":"วรชิต กนิษฐ์ศรีบำเพ็ญ"},{"n":"Sittha Boonlha","c":"POR","p":"MF","t":"THA","k":47,"th":"สิทธา บุญหล้า"},{"n":"Michael Falkesgaard","c":"POR","p":"GK","t":"PHI","k":93,"th":"ไมเคิล ฟอล์คสการ์ด"},{"n":"Apirak Worawong","c":"CRU","p":"GK","t":"THA","k":1,"th":"อภิรักษ์ วรวงษ์"},{"n":"Banphakit Phormmanee","c":"CRU","p":"DF","t":"THA","k":2,"th":"บรรพกิจ พรมมณี"},{"n":"Tanasak Srisai","c":"CRU","p":"DF","t":"THA","k":3,"th":"ธนศักดิ์ ศรีใส"},{"n":"Piyaphon Phanichakul","c":"CRU","p":"DF","t":"THA","k":4,"th":"ปิยพล พาณิชกุล"},{"n":"Marco Ballini","c":"CRU","p":"DF","t":"THA","k":5,"th":"มาร์โก บัลลินี"},{"n":"Settasit Suvannaseat","c":"CRU","p":"MF","t":"THA","k":6,"th":"เศรษฐสิทธิ์ สุวรรณเศรษฐ"},{"n":"Sanukran Thinjom","c":"CRU","p":"MF","t":"THA","k":7,"th":"ศนุกรานต์ ถิ่นจอม"},{"n":"Lee Seung-won","c":"CRU","p":"FW","t":"KOR","k":8,"th":"อี ซึง-วอน"},{"n":"Dudu","c":"CRU","p":"MF","t":"BRA","k":10,"th":"ดูดู"},{"n":"Carlos Iury","c":"CRU","p":"FW","t":"BRA","k":11,"th":"การ์ลอส อิอูรี"},{"n":"Gionata Verzura","c":"CRU","p":"MF","t":"THA","k":17,"th":"จิโอนาตา แวร์ซูรา"},{"n":"Farus Patee","c":"CRU","p":"GK","t":"THA","k":19,"th":"ฟารุส ปาตี"},{"n":"Thakdanai Jaihan","c":"CRU","p":"MF","t":"THA","k":20,"th":"ทักษ์ดนัย ใจหาญ"},{"n":"Victor Cardozo","c":"CRU","p":"DF","t":"BRA","k":23,"th":"วิกตอร์ การ์โดโซ"},{"n":"Hélio","c":"CRU","p":"DF","t":"BRA","k":28,"th":"เอลิโอ"},{"n":"Montree Promsawat","c":"CRU","p":"MF","t":"THA","k":32,"th":"มนตรี พรหมสวัสดิ์"},{"n":"Sirassawut Wongruankhum","c":"CRU","p":"GK","t":"THA","k":34,"th":"ศิรัสวุฒิ วงศ์เรือนคำ"},{"n":"Phoptham Pornkod","c":"CRU","p":"MF","t":"THA","k":37,"th":"พบธรรม พรกด"},{"n":"Chinngoen Phutonyong","c":"CRU","p":"FW","t":"THA","k":39,"th":"ชินเงิน ภูโทนยง"},{"n":"Jetnipat Khomsom","c":"CRU","p":"GK","t":"THA","k":40,"th":"เจตนิพัทธ์ คมสม"},{"n":"Ongsa Singthong","c":"CRU","p":"DF","t":"THA","k":50,"th":"องศา สิงห์ทอง"},{"n":"Nanthiphat Chaiman","c":"CRU","p":"DF","t":"THA","k":77,"th":"นันทิพัฒน์ ไชยมาลย์"},{"n":"Jordan Emaviwe","c":"CRU","p":"DF","t":"SGP","k":90,"th":"จอร์แดน เอมาวิเว"},{"n":"Thawatchai Inprakhon","c":"CRU","p":"DF","t":"THA","k":92,"th":"ธวัชชัย อินทร์ประโคน"},{"n":"Gabriel Henrique","c":"CRU","p":"MF","t":"BRA","k":98,"th":"กาเบรียล เอนรีเก"},{"n":"Kevin Ray Mendoza","c":"CHO","p":"GK","t":"PHI","k":1,"th":"เควิน เรย์ เมนโดซา"},{"n":"Kike Linares","c":"CHO","p":"DF","t":"PHI","k":2,"th":"กิเก ลินาเรส"},{"n":"Peerapat Notchaiya","c":"CHO","p":"DF","t":"THA","k":3,"th":"พีรพัฒน์ โน๊ตชัยยา"},{"n":"Kittipong Sansanit","c":"CHO","p":"DF","t":"THA","k":4,"th":"กิตติพงษ์ แสนสนิท"},{"n":"Yotsakorn Burapha","c":"CHO","p":"FW","t":"THA","k":8,"th":"ยศกร บูรพา"},{"n":"Dennis Murillo","c":"CHO","p":"FW","t":"BRA","k":9,"th":"เดนนิส มูริลโญ"},{"n":"Channarong Promsrikaew","c":"CHO","p":"MF","t":"THA","k":10,"th":"ชาญณรงค์ พรมศรีแก้ว"},{"n":"Korawich Tasa","c":"CHO","p":"FW","t":"THA","k":11,"th":"กรวิชญ์ ทาสา"},{"n":"Chaowat Veerachat","c":"CHO","p":"MF","t":"THA","k":14,"th":"เชาว์วัฒน์ วีระชาติ"},{"n":"Tristan Do","c":"CHO","p":"DF","t":"THA","k":19,"th":"ตริสตอง โด"},{"n":"Suksan Bunta","c":"CHO","p":"DF","t":"THA","k":20,"th":"สุขสันต์ บุญตา"},{"n":"Siraphop Wandee","c":"CHO","p":"MF","t":"THA","k":21,"th":"ศิรภพ วันดี"},{"n":"Santiphap Channgom","c":"CHO","p":"DF","t":"THA","k":23,"th":"สันติภาพ จันทร์งาม"},{"n":"Richmond Darko","c":"CHO","p":"MF","t":"GHA","k":28,"th":"ริชมอนด์ ดาร์โก"},{"n":"Sittichok Paso","c":"CHO","p":"FW","t":"THA","k":31,"th":"สิทธิโชค ภาโส"},{"n":"Rachata Moraksa","c":"CHO","p":"DF","t":"THA","k":32,"th":"รชต หมอรักษา"},{"n":"Thanaset Sujarit","c":"CHO","p":"DF","t":"THA","k":36,"th":"ธนเศรษฐ์ สุจริต"},{"n":"Nattapong Sayriya","c":"CHO","p":"DF","t":"THA","k":37,"th":"ณัฐพงษ์ สายริยา"},{"n":"Ryoma Ito","c":"CHO","p":"FW","t":"JPN","k":41,"th":"เรียวมะ อิโตะ"},{"n":"Noppakun Kadtoon","c":"CHO","p":"GK","t":"THA","k":46,"th":"นพคุณ กาดตูน"},{"n":"Jorge Fellipe","c":"CHO","p":"DF","t":"BRA","k":47,"th":"ฮอร์เก เฟลลิเป"},{"n":"Siwat Chomphooviset","c":"CHO","p":"GK","t":"THA","k":70,"th":"ศิวัช ชมภูวิเศษ"},{"n":"Thanphisit Peanksikum","c":"CHO","p":"DF","t":"THA","k":71,"th":"ธันพิสิษฐ์ เพียรศิขุม"},{"n":"Ratchanon Phoonpatanasab","c":"CHO","p":"DF","t":"THA","k":72,"th":"รัชชานนท์ พูนพัฒนทรัพย์"},{"n":"Wathanyu Nairatsami","c":"CHO","p":"DF","t":"THA","k":74,"th":"วทัญญู นัยรัศมี"},{"n":"Tanakon Pinkaew","c":"CHO","p":"MF","t":"THA","k":75,"th":"ธนากร ปิ่นแก้ว"},{"n":"Chayathorn Tapsuvanavon","c":"CHO","p":"MF","t":"THA","k":80,"th":"ชยธร ทัพสุวรรณวร"},{"n":"Thanawat Panthong","c":"CHO","p":"GK","t":"THA","k":87,"th":"ธนวัฒน์ ปานทอง"},{"n":"Jaturapat Sattham","c":"CHO","p":"DF","t":"THA","k":null,"th":"จตุรภัทร์ สัตย์ธรรม"},{"n":"Witthaya Moonwong","c":"LWR","p":"DF","t":"THA","k":2,"th":"วิทยา มูลวงษ์"},{"n":"Jonas Schwabe","c":"LWR","p":"DF","t":"THA","k":4,"th":"โยนาส ชวาเบ"},{"n":"Todsapol Lated","c":"LWR","p":"DF","t":"THA","k":6,"th":"ทศพล หลาเต๊ะ"},{"n":"Dominik Schad","c":"LWR","p":"MF","t":"GER","k":7,"th":"โดมินิก ชาด"},{"n":"Kenshiro Daniels","c":"LWR","p":"FW","t":"PHI","k":9,"th":"เคนชิโร แดเนียลส์"},{"n":"Mohammed Osman","c":"LWR","p":"MF","t":"SYR","k":14,"th":"โมฮัมเหม็ด ออสมาน"},{"n":"Ralph","c":"LWR","p":"MF","t":"BRA","k":17,"th":"ราล์ฟ"},{"n":"Tawan Khotrsupho","c":"LWR","p":"FW","t":"THA","k":19,"th":"ตะวัน โคตรสุโพธิ์"},{"n":"Nont Muangngam","c":"LWR","p":"GK","t":"THA","k":20,"th":"นนท์ เมืองงาม"},{"n":"Tossaporn Chuchin","c":"LWR","p":"DF","t":"THA","k":21,"th":"ทศพร ชูชื่น"},{"n":"Aly Cissokho","c":"LWR","p":"DF","t":"FRA","k":22,"th":"อาลี ซิสโซโก"},{"n":"Charlie Clough","c":"LWR","p":"DF","t":"ENG","k":23,"th":"ชาร์ลี คลัฟ"},{"n":"Noppol Kerdkaew","c":"LWR","p":"DF","t":"THA","k":24,"th":"นพพล เกิดแก้ว"},{"n":"Surat Suriyachai","c":"LWR","p":"FW","t":"THA","k":25,"th":"สุรัฐ สุริยะชัย"},{"n":"Kwanchai Suklom","c":"LWR","p":"GK","t":"THA","k":26,"th":"ขวัญชัย สุขล้อม"},{"n":"Nuttee Noiwilai","c":"LWR","p":"DF","t":"THA","k":27,"th":"ณัฐตี้ น้อยวิลัย"},{"n":"Willen Mota","c":"LWR","p":"FW","t":"BRA","k":29,"th":"วิลเลน โมตา"},{"n":"Suriya Singmui","c":"LWR","p":"DF","t":"THA","k":30,"th":"สุริยา สิงห์มุ้ย"},{"n":"Thirawooth Sruanson","c":"LWR","p":"GK","t":"THA","k":31,"th":"ธีราวุฒิ สรวนสน"},{"n":"Baworn Tapla","c":"LWR","p":"MF","t":"THA","k":32,"th":"บวร ทาปลา"},{"n":"Oskari Kekkonen","c":"LWR","p":"MF","t":"PHI","k":55,"th":"ออสการี เคคโคเนน"},{"n":"Athit Berg","c":"LWR","p":"FW","t":"THA","k":null,"th":"อาทิตย์ เบิร์ก"},{"n":"Chatmongkol Thongkiri","c":"LWR","p":"MF","t":"THA","k":null,"th":"ฉัตรมงคล ทองคีรี"},{"n":"Putthinan Wannasri","c":"LWR","p":"DF","t":"THA","k":null,"th":"พุฒินันท์ วรรณศรี"},{"n":"Purachet Thodsanit","c":"LWR","p":"MF","t":"THA","k":null,"th":"ปุรเชษฐ์ ทศนิตย์"},{"n":"Rodrigo Maranhão","c":"LWR","p":"FW","t":"BRA","k":null,"th":"โรดริโก มารานเยา"},{"n":"Osarenren Okungbowa","c":"LWR","p":"MF","t":"AUT","k":null,"th":"โอซาเรนเรน โอคุงโบวา"},{"n":"Akarapong Pumwisat","c":"LWR","p":"MF","t":"THA","k":null,"th":"อัครพงษ์ พุ่มวิเศษ"},{"n":"Abdulrahman Essadi","c":"LWR","p":"FW","t":"THA","k":null,"th":"อับดุลเราะห์มาน เอสซาดี"},{"n":"Ninuruddin Nideha","c":"PTN","p":"GK","t":"THA","k":1,"th":"นินูรุดดีน นิเดะ"},{"n":"Ekkachai Sumrei","c":"PTN","p":"DF","t":"THA","k":2,"th":"เอกชัย ซุมเร"},{"n":"Afis Waeyama","c":"PTN","p":"DF","t":"THA","k":3,"th":"อาฟิส แวยามา"},{"n":"Tinnakorn Asurin","c":"PTN","p":"DF","t":"THA","k":4,"th":"ทินกร อาสุรินทร์"},{"n":"Ratthakron Thongkae","c":"PTN","p":"DF","t":"THA","k":5,"th":"รัฐกร ทองแก้"},{"n":"Muhammadnasay Kolaeh","c":"PTN","p":"MF","t":"THA","k":6,"th":"มูฮัมหมัดนาเซ โกแล"},{"n":"Adithep Chaipraman","c":"PTN","p":"FW","t":"THA","k":7,"th":"อดิเทพ ชัยประมาณ"},{"n":"Chukid Wanpraphao","c":"PTN","p":"FW","t":"THA","k":8,"th":"ชูกิจ วรรณประเภา"},{"n":"Janepob Phokhi","c":"PTN","p":"FW","t":"THA","k":9,"th":"เจนภพ โพธิ์ขี"},{"n":"Felipe Nunes","c":"PTN","p":"MF","t":"BRA","k":10,"th":"เฟลิเป นูเนส"},{"n":"Rushdan Katemmadee","c":"PTN","p":"FW","t":"THA","k":11,"th":"รุชดาน กะเต็มมาดี"},{"n":"Rico Andes","c":"PTN","p":"FW","t":"PHI","k":14,"th":"ริโก แอนเดส"},{"n":"Abdulhakim Cehsani","c":"PTN","p":"DF","t":"THA","k":15,"th":"อับดุลฮากิม เจะซานี"},{"n":"Shuto Ono","c":"PTN","p":"MF","t":"JPN","k":16,"th":"ชูโตะ โอโนะ"},{"n":"Ittipon Khampliw","c":"PTN","p":"DF","t":"THA","k":19,"th":"อิทธิพล คำปลิว"},{"n":"Nasree Dueloh","c":"PTN","p":"DF","t":"THA","k":23,"th":"นัสรี ดือเลาะ"},{"n":"Amran Bungosayu","c":"PTN","p":"GK","t":"THA","k":25,"th":"อัมราน บุงอสายู"},{"n":"Marlon Silva","c":"PTN","p":"DF","t":"BRA","k":26,"th":"มาร์ลอน ซิลวา"},{"n":"Adam Lassamano","c":"PTN","p":"MF","t":"THA","k":30,"th":"อาดัม ลาสมาโน"},{"n":"Anuwa Koowing","c":"PTN","p":"DF","t":"THA","k":32,"th":"อนุวา คูวิง"},{"n":"Kittipong Buathong","c":"PTN","p":"DF","t":"THA","k":36,"th":"กิตติพงษ์ บัวทอง"},{"n":"Kirati Kaewnongdang","c":"PTN","p":"MF","t":"THA","k":40,"th":"คีรติ แก้วหนองแดง"},{"n":"Naruephon Proomimas","c":"PTN","p":"MF","t":"THA","k":42,"th":"นฤพล พรหมมิมาส"},{"n":"Thirapak Prueangna","c":"PTN","p":"MF","t":"THA","k":64,"th":"ธีรภัค เปรื่องนา"},{"n":"Imron Hayiyusoh","c":"PTN","p":"FW","t":"THA","k":90,"th":"อิมรอน หะยียูโซะ"},{"n":"Carlos Neto","c":"PTN","p":"FW","t":"BRA","k":96,"th":"การ์ลอส เนโต"},{"n":"Muhammat Mamah","c":"PTN","p":"GK","t":"THA","k":99,"th":"มูฮัมหมัด มามะ"},{"n":"Rattanai Songsangchan","c":"PTP","p":"GK","t":"THA","k":1,"th":"รัฐนัย ทรงแสงจันทร์"},{"n":"Oussama Thiangkham","c":"PTP","p":"DF","t":"THA","k":2,"th":"อุซามา เทียงคำ"},{"n":"Bernardo Vilar","c":"PTP","p":"DF","t":"BRA","k":3,"th":"เบร์นาร์โด วิลาร์"},{"n":"Adrian Ugelvik","c":"PTP","p":"DF","t":"PHI","k":4,"th":"เอเดรียน อูเกลวิก"},{"n":"Airton","c":"PTP","p":"DF","t":"BRA","k":5,"th":"ไอร์ตัน"},{"n":"Saharat Kanyaroj","c":"PTP","p":"MF","t":"THA","k":8,"th":"สหรัฐ กันยะโรจน์"},{"n":"Lee Jeong-hyeop","c":"PTP","p":"FW","t":"KOR","k":9,"th":"อี จอง-ฮยอบ"},{"n":"Tauã","c":"PTP","p":"FW","t":"BRA","k":10,"th":"เตาอา"},{"n":"Rei Tachikawa","c":"PTP","p":"MF","t":"JPN","k":11,"th":"เรอิ ทาจิกาวะ"},{"n":"Andros Townsend","c":"PTP","p":"MF","t":"ENG","k":14,"th":"แอนดรอส ทาวน์เซนด์"},{"n":"Jesper Nyholm","c":"PTP","p":"DF","t":"PHI","k":15,"th":"เยสเปอร์ นีโฮล์ม"},{"n":"Édgar Méndez","c":"PTP","p":"FW","t":"ESP","k":17,"th":"เอ็ดการ์ เมนเดซ"},{"n":"Soponwit Rakyart","c":"PTP","p":"GK","t":"THA","k":18,"th":"โสภณวิชญ์ รักญาติ"},{"n":"Prommin Pinkeaw","c":"PTP","p":"MF","t":"THA","k":19,"th":"พรหมมินทร์ ปิ่นแก้ว"},{"n":"Michel","c":"PTP","p":"FW","t":"BRA","k":20,"th":"มิเชล"},{"n":"Kannarin Thawornsak","c":"PTP","p":"MF","t":"THA","k":23,"th":"กันนรินทร์ ถาวรศักดิ์"},{"n":"Zopfan Sanron","c":"PTP","p":"MF","t":"THA","k":28,"th":"ซอฟฟาน แสนร่อน"},{"n":"Jittiphat Wasungnoen","c":"PTP","p":"MF","t":"THA","k":30,"th":"จิตติพัฒน์ วะสังเนิน"},{"n":"Wattanachai Srathongjan","c":"PTP","p":"GK","t":"THA","k":39,"th":"วัฒนชัย สระทองจันทร์"},{"n":"Phanthamit Praphanth","c":"PTP","p":"FW","t":"THA","k":41,"th":"พันธมิตร ประพันธ์"},{"n":"Wuttikai Sritong","c":"PTP","p":"MF","t":"THA","k":44,"th":"วุฒิไกร ศรีทอง"},{"n":"Chitsanuphong Phimpsang","c":"PTP","p":"MF","t":"THA","k":47,"th":"ชิษณุพงศ์ พิมพ์แสง"},{"n":"Jehhanafee Mamah","c":"PTP","p":"FW","t":"THA","k":48,"th":"เจ๊ะฮานาฟี มามะ"},{"n":"Wanchat Chosong","c":"PTP","p":"DF","t":"THA","k":66,"th":"วันฉัตร โชสง"},{"n":"Nick Taylor","c":"PTP","p":"MF","t":"CAM","k":67,"th":"นิก เทย์เลอร์"},{"n":"Prasit Jantum","c":"PTP","p":"MF","t":"THA","k":70,"th":"ประสิทธิ์ จันทึม"},{"n":"Phon-Ek Jensen","c":"PTP","p":"DF","t":"THA","k":74,"th":"พลเอก เจนเซน"},{"n":"Jirapan Phasukihan","c":"PTP","p":"FW","t":"THA","k":88,"th":"จิราพันธ์ ผาสุขีหัน"},{"n":"Abdulfarus Sama-aeh","c":"PTP","p":"GK","t":"THA","k":99,"th":"อับดุลฟารุส สะมะแอ"},{"n":"Chotika Meuanta","c":"RSL","p":"DF","t":"THA","k":3,"th":"โชติกา เหมือนตา"},{"n":"Ramon Mesquita","c":"RSL","p":"DF","t":"BRA","k":5,"th":"รามอน เมสกีตา"},{"n":"Yuga Watanabe","c":"RSL","p":"FW","t":"JPN","k":7,"th":"ยูกะ วาตานาเบะ"},{"n":"Natchanon Yongsakool","c":"RSL","p":"MF","t":"THA","k":8,"th":"ณัฐชนนท์ ยงสกุล"},{"n":"Gilberto Macena","c":"RSL","p":"MF","t":"BRA","k":10,"th":"กิลแบร์โต มาเซนา"},{"n":"Ricardo Cardoso","c":"RSL","p":"FW","t":"STP","k":11,"th":"ริการ์โด การ์โดโซ"},{"n":"Nakhwan Gamol","c":"RSL","p":"MF","t":"THA","k":16,"th":"นาควัน กามล"},{"n":"Apsit Nusonsala","c":"RSL","p":"DF","t":"THA","k":19,"th":"อภิสิทธิ์ นุสนศาลา"},{"n":"Wichit Thanee","c":"RSL","p":"MF","t":"THA","k":20,"th":"วิชิต ธานี"},{"n":"Apirak Thongjan","c":"RSL","p":"DF","t":"THA","k":21,"th":"อภิรักษ์ ทองจันทร์"},{"n":"Phitchanon Chanluang","c":"RSL","p":"FW","t":"THA","k":22,"th":"พิชชานนท์ จันทร์เหลือง"},{"n":"Jirawat Chingchaiyaphum","c":"RSL","p":"MF","t":"THA","k":23,"th":"จิรวัฒน์ ชิงชัยภูมิ"},{"n":"Chawanthananchai Sirichoo","c":"RSL","p":"DF","t":"THA","k":25,"th":"ชวัลธนันท์ชัย ศิริชู"},{"n":"Supab Muengchan","c":"RSL","p":"FW","t":"THA","k":27,"th":"สุภาพ เมืองจันทร์"},{"n":"Thanongsak Khrutthasarn","c":"RSL","p":"MF","t":"THA","k":28,"th":"ทนงศักดิ์ ครุฑสาร"},{"n":"Thitiphong Photumtha","c":"RSL","p":"DF","t":"THA","k":30,"th":"ฐิติพงษ์ โพธิ์ทุมทา"},{"n":"Teerapol Anupan","c":"RSL","p":"MF","t":"THA","k":31,"th":"ธีรพล อนุพันธ์"},{"n":"Somyot Pongsuwan","c":"RSL","p":"MF","t":"THA","k":32,"th":"สมยศ พงษ์สุวรรณ"},{"n":"Apinat Suksanguan","c":"RSL","p":"MF","t":"THA","k":34,"th":"อภินัฐ สุขสงวน"},{"n":"Matías Panigazzi","c":"RSL","p":"MF","t":"ARG","k":35,"th":"มาติอัส ปานิกาซซี"},{"n":"Hamed Bakhtiari","c":"RSL","p":"DF","t":"IRN","k":40,"th":"ฮาเหม็ด บัคเตียรี"},{"n":"Pongsakorn Buatab","c":"RSL","p":"GK","t":"THA","k":42,"th":"พงศกร บัวทับ"},{"n":"Wichit Kongsinkaew","c":"RSL","p":"MF","t":"THA","k":44,"th":"วิชิต กองสินแก้ว"},{"n":"Tayawat Nomrawee","c":"RSL","p":"MF","t":"THA","k":47,"th":"ทยาวัต นมระวี"},{"n":"Yingyong Butngam","c":"RSL","p":"DF","t":"THA","k":55,"th":"ยิ่งยง บุตรงาม"},{"n":"Natthaphob Chaimongkhon","c":"RSL","p":"MF","t":"THA","k":56,"th":"ณัฐภพ ชัยมงคล"},{"n":"Phumworraphon Wannabutr","c":"RSL","p":"GK","t":"THA","k":57,"th":"ภูมิวรพล วรรณบุตร"},{"n":"Nattapon Yongsakool","c":"RSL","p":"MF","t":"THA","k":77,"th":"ณัฐพล ยงสกุล"},{"n":"Sarawut Thongkot","c":"RSL","p":"MF","t":"THA","k":81,"th":"สราวุธ ทองกอด"},{"n":"Phetsai Jantaweewong","c":"RSL","p":"FW","t":"THA","k":88,"th":"เพชรทราย จันทวีวงศ์"},{"n":"Puttiphong Sriputta","c":"RSL","p":"DF","t":"THA","k":89,"th":"พุฒิพงษ์ ศรีพุทธา"},{"n":"Phongsakon Trisat","c":"RSL","p":"DF","t":"THA","k":91,"th":"พงศกร ตรีศาสตร์"},{"n":"Sakkongpop Sukprasert","c":"RSL","p":"GK","t":"THA","k":99,"th":"ศักดิ์ก้องภพ สุขประเสริฐ"},{"n":"Jakkit Palapon","c":"RSL","p":"FW","t":"THA","k":null,"th":"จักรกฤษณ์ พละพล"},{"n":"Nelson Orji","c":"RSL","p":"DF","t":"NGA","k":null,"th":"เนลสัน ออร์จี"},{"n":"Kim Ji-min","c":"RSL","p":"FW","t":"KOR","k":null,"th":"คิม จี-มิน"},{"n":"Nattapon Malapun","c":"RSL","p":"DF","t":"THA","k":null,"th":"ณัฐพล มาลาพันธ์"},{"n":"Nopphon Lakhonphon","c":"RBM","p":"GK","t":"THA","k":1,"th":"นพพล ลาคนผล"},{"n":"Jonathan Khemdee","c":"RBM","p":"DF","t":"THA","k":4,"th":"โจนาธาร์ เข็มดี"},{"n":"Daniel Ting","c":"RBM","p":"DF","t":"MAS","k":5,"th":"แดเนียล ติง"},{"n":"Tana","c":"RBM","p":"MF","t":"ESP","k":6,"th":"ตาน่า"},{"n":"Denílson","c":"RBM","p":"FW","t":"BRA","k":7,"th":"เดนิลสัน"},{"n":"Thanawat Suengchitthawon","c":"RBM","p":"MF","t":"THA","k":8,"th":"ธนวัฒน์ สึงชิตทวร"},{"n":"Gleyson","c":"RBM","p":"FW","t":"BRA","k":9,"th":"เกลย์สัน"},{"n":"Roque Mesa","c":"RBM","p":"MF","t":"ESP","k":14,"th":"โรเก เมซา"},{"n":"Adisorn Promrak","c":"RBM","p":"DF","t":"THA","k":15,"th":"อดิศร พรหมรักษ์"},{"n":"Siwakorn Jakkuprasat","c":"RBM","p":"MF","t":"THA","k":16,"th":"ศิวกร จักขุประสาท"},{"n":"Teeraphol Yoryoei","c":"RBM","p":"MF","t":"THA","k":18,"th":"ธีรพล เยาะเย้ย"},{"n":"Ekanit Panya","c":"RBM","p":"MF","t":"THA","k":21,"th":"เอกนิษฐ์ ปัญญา"},{"n":"Kevin Deeromram","c":"RBM","p":"DF","t":"THA","k":23,"th":"เควิน ดีรมรัมย์"},{"n":"Jesse Curran","c":"RBM","p":"MF","t":"PHI","k":27,"th":"เจสซี เคอร์ราน"},{"n":"Thossawat Limwannasathian","c":"RBM","p":"MF","t":"THA","k":28,"th":"ทศวรรษ ลิ้มวรรณเสถียร"},{"n":"Kiatisak Jiamudom","c":"RBM","p":"DF","t":"THA","k":29,"th":"เกียรติศักดิ์ เจียมอุดม"},{"n":"Pethey Promjan","c":"RBM","p":"DF","t":"THA","k":33,"th":"เพธี พรมจันทร์"},{"n":"Kritsananon Srisuwan","c":"RBM","p":"MF","t":"THA","k":37,"th":"กฤษณนนท์ ศรีสุวรรณ"},{"n":"Faiq Bolkiah","c":"RBM","p":"MF","t":"BRU","k":77,"th":"ฟาอิค โบลเกียห์"},{"n":"Chotipat Poomkaew","c":"RBM","p":"MF","t":"THA","k":88,"th":"โชติพัฒน์ พุ่มแก้ว"},{"n":"Njiva Rakotoharimalala","c":"RBM","p":"MF","t":"MAD","k":89,"th":"นจีวา ราโคโตฮาริมาลาลา"},{"n":"Ukrit Wongmeema","c":"RBM","p":"GK","t":"THA","k":97,"th":"อุกฤษ วงศ์มีมา"},{"n":"Kampol Pathomakkakul","c":"RBM","p":"GK","t":"THA","k":99,"th":"กัมพล ปฐมอัครกุล"},{"n":"Sorawit Panthong","c":"RBM","p":"MF","t":"THA","k":null,"th":"สรวิศ ปานทอง"},{"n":"Jordan Gele","c":"RBM","p":"FW","t":"FRA","k":null,"th":"จอร์แดน เกเล"},{"n":"Akinkunmi Amoo","c":"RBM","p":"MF","t":"NGA","k":null,"th":"อาคินกุนมิ อามู"},{"n":"Tarek Aggoun","c":"RBM","p":"DF","t":"ALG","k":null,"th":"ตาเร็ก อากูน"},{"n":"Jonathan Viera","c":"RBM","p":"MF","t":"ESP","k":null,"th":"โจนาธาน เบียรา"},{"n":"Rafael Bilú","c":"RBM","p":"FW","t":"BRA","k":null,"th":"ราฟาเอล บิลู"},{"n":"João Afonso","c":"RAY","p":"MF","t":"BRA","k":6,"th":"ชูเอา อาฟองโซ"},{"n":"Mehti Sarakham","c":"RAY","p":"FW","t":"THA","k":7,"th":"เมห์ตี สารคาม"},{"n":"Keven Alemán","c":"RAY","p":"MF","t":"CAN","k":8,"th":"เควิน อาเลมาน"},{"n":"Somkaet Kunmee","c":"RAY","p":"MF","t":"THA","k":10,"th":"สมเกตุ คุณมี"},{"n":"Thanphisit Hempandan","c":"RAY","p":"FW","t":"THA","k":13,"th":"ธันพิสิษฐ์ เหมพันดาน"},{"n":"Stefan Cebara","c":"RAY","p":"DF","t":"CAN","k":14,"th":"สเตฟาน เซบารา"},{"n":"Saharat Sontisawat","c":"RAY","p":"MF","t":"THA","k":15,"th":"สหรัฐ สนธิสวัสดิ์"},{"n":"Supawit Romphopak","c":"RAY","p":"DF","t":"THA","k":19,"th":"ศุภวิชญ์ รมโพธิ์ภักดิ์"},{"n":"Leonardo Justiniano","c":"RAY","p":"DF","t":"BOL","k":20,"th":"เลโอนาร์โด จุสตินิอาโน"},{"n":"Maxx Creevey","c":"RAY","p":"DF","t":"THA","k":23,"th":"แม็กซ์ ครีวีย์"},{"n":"Anon Amornlerdsak","c":"RAY","p":"MF","t":"THA","k":27,"th":"อานนท์ อมรเลิศศักดิ์"},{"n":"Wichaya Gantong","c":"RAY","p":"GK","t":"THA","k":30,"th":"วิชญะ กันทอง"},{"n":"Parkin Harape","c":"RAY","p":"DF","t":"THA","k":31,"th":"ภาคิน หะรเป"},{"n":"Worawut Srisupha","c":"RAY","p":"GK","t":"THA","k":36,"th":"วรวุฒิ ศรีสุภา"},{"n":"Ketanuson Junrung","c":"RAY","p":"GK","t":"THA","k":50,"th":"เกตนุสรณ์ จันทร์รุ่ง"},{"n":"Chainarong Boonkerd","c":"RAY","p":"GK","t":"THA","k":54,"th":"ชัยณรงค์ บุญเกิด"},{"n":"Nonthawat Bathong","c":"RAY","p":"MF","t":"THA","k":66,"th":"นนทวัฒน์ บาทอง"},{"n":"Porrameth Ittiprasert","c":"RAY","p":"MF","t":"THA","k":74,"th":"ปรเมศ อิทธิประเสริฐ"},{"n":"Wattanapong Withunat","c":"RAY","p":"MF","t":"THA","k":80,"th":"วัฒนพงษ์ วิทูนาท"},{"n":"Manuel Ott","c":"RAY","p":"MF","t":"PHI","k":88,"th":"มานูเอล อ็อตต์"},{"n":"Peerapat Kaminthong","c":"RAY","p":"MF","t":"THA","k":90,"th":"พีรพัฒน์ ขมิ้นทอง"},{"n":"Weslen Júnior","c":"RAY","p":"FW","t":"BRA","k":99,"th":"เวสเลน จูเนียร์"},{"n":"Parndecha Ngernprasert","c":"RAY","p":"MF","t":"THA","k":null,"th":"ปานเดชา เงินประเสริฐ"},{"n":"Yeo Hong-gyu","c":"RAY","p":"MF","t":"KOR","k":null,"th":"ยอ ฮง-กยู"},{"n":"Stênio Júnior","c":"RAY","p":"FW","t":"BRA","k":null,"th":"สเตนิโอ จูเนียร์"},{"n":"Victor Golas","c":"SKU","p":"GK","t":"BRA","k":1,"th":"วิกตอร์ โกลาส"},{"n":"Denis Darbellay","c":"SKU","p":"MF","t":"THA","k":2,"th":"เดนิส ดาร์เบลเลย์"},{"n":"Guilherme Borech","c":"SKU","p":"DF","t":"BRA","k":3,"th":"กีแยร์เม โบเรช"},{"n":"Pakornkiat Kaena","c":"SKU","p":"DF","t":"THA","k":5,"th":"ปกรณ์เกียรติ แก้วนา"},{"n":"Alex Mermoz","c":"SKU","p":"FW","t":"CMR","k":7,"th":"อเล็กซ์ แมร์โมซ"},{"n":"Hikaru Matsui","c":"SKU","p":"MF","t":"JPN","k":8,"th":"ฮิคารุ มัตสึอิ"},{"n":"Jefesson Vieira","c":"SKU","p":"FW","t":"BRA","k":9,"th":"เจเฟสสัน วิเอรา"},{"n":"Deyvison Fernandes","c":"SKU","p":"FW","t":"BRA","k":10,"th":"เดย์วิสัน เฟร์นันเดส"},{"n":"Phattharpong Phengchaem","c":"SKU","p":"MF","t":"THA","k":11,"th":"ภัทรพงศ์ เพ็งแจ่ม"},{"n":"Wongsakorn Saenruecha","c":"SKU","p":"FW","t":"THA","k":17,"th":"วงศกร แสนฤชา"},{"n":"Kittipong Wongma","c":"SKU","p":"FW","t":"THA","k":19,"th":"กิตติพงษ์ วงศ์มา"},{"n":"Patrick Valverde","c":"SKU","p":"FW","t":"BRA","k":20,"th":"ปาทริก วัลเบร์เด"},{"n":"Pongsakron Hanrattana","c":"SKU","p":"DF","t":"THA","k":22,"th":"พงศกร หาญรัตนะ"},{"n":"Narongrit Kamnet","c":"SKU","p":"MF","t":"THA","k":23,"th":"ณรงค์ฤทธิ์ คำเนตร"},{"n":"Phiyawat Intarapim","c":"SKU","p":"GK","t":"THA","k":27,"th":"ปิยวัฒน์ อินทรพิมพ์"},{"n":"Isaac Honny","c":"SKU","p":"DF","t":"GHA","k":35,"th":"ไอแซค ฮอนนี"},{"n":"Suphaphon Sutthisak","c":"SKU","p":"MF","t":"THA","k":37,"th":"สุภาพล สุทธิศักดิ์"},{"n":"Anusak Jaiphet","c":"SKU","p":"DF","t":"THA","k":39,"th":"อนุศักดิ์ ใจเพชร"},{"n":"Natthasan Pakkarano","c":"SKU","p":"GK","t":"THA","k":44,"th":"ณัฐสันต์ ปักกะราโน"},{"n":"Chutikom Klinchampasri","c":"SKU","p":"DF","t":"THA","k":45,"th":"ชุติคม กลิ่นจำปาศรี"},{"n":"Kritidet Nanthawong","c":"SKU","p":"MF","t":"THA","k":55,"th":"กฤติเดช นันทวงศ์"},{"n":"Arthit Buangam","c":"SKU","p":"DF","t":"THA","k":67,"th":"อาทิตย์ บัวงาม"},{"n":"Sorasak Khampanja","c":"SKU","p":"GK","t":"THA","k":70,"th":"สรศักดิ์ คำปัญจะ"},{"n":"Steven van Dijk","c":"SKU","p":"GK","t":"NED","k":77,"th":"สตีเวน ฟาน ไดก์"},{"n":"Sakkarawit Nimma","c":"SKU","p":"DF","t":"THA","k":88,"th":"ศักราวิชญ์ นิ่มมา"},{"n":"Thanison Paiboonkitjaroen","c":"SKU","p":"DF","t":"THA","k":92,"th":"ธนิสร ไพบูลย์กิจเจริญ"},{"n":"Mahamadou Doucouré","c":"SKU","p":"FW","t":"MLI","k":93,"th":"มามาดู ดูกูเร"},{"n":"Suttichai Pongson","c":"SKU","p":"MF","t":"THA","k":97,"th":"สุทธิชัย พงษ์สนธิ์"},{"n":"Sittichok Kannoo","c":"SKU","p":"FW","t":"THA","k":99,"th":"สิทธิโชค กันนุ"},{"n":"Surawich Logarwit","c":"SUK","p":"DF","t":"THA","k":2,"th":"สุรวิช โลกาวิทย์"},{"n":"Pattarapon Suksakit","c":"SUK","p":"DF","t":"THA","k":3,"th":"ภัทรพล สุขสกิจ"},{"n":"Romeu","c":"SUK","p":"MF","t":"BRA","k":5,"th":"โรเมว"},{"n":"Lursan Thiamrat","c":"SUK","p":"MF","t":"THA","k":7,"th":"ลือสันต์ เทียมรัตน์"},{"n":"Ratchanat Aranpiroj","c":"SUK","p":"MF","t":"THA","k":8,"th":"รัชนาท อรัญไพโรจน์"},{"n":"João Paredes","c":"SUK","p":"FW","t":"POR","k":9,"th":"ชูเอา ปาเรเดส"},{"n":"John Baggio","c":"SUK","p":"FW","t":"MAD","k":10,"th":"จอห์น บาจโจ"},{"n":"Gildo","c":"SUK","p":"FW","t":"BRA","k":11,"th":"จิลโด"},{"n":"Saringkan Promsupa","c":"SUK","p":"DF","t":"THA","k":15,"th":"ศฤงคาร พรหมสุภา"},{"n":"Phanuphong Sunon","c":"SUK","p":"GK","t":"THA","k":16,"th":"ภาณุพงศ์ สุนนท์"},{"n":"Tassanapong Muaddarak","c":"SUK","p":"DF","t":"THA","k":17,"th":"ทัศนพงษ์ หมวดดารักษ์"},{"n":"Supazin Hnupichai","c":"SUK","p":"GK","t":"THA","k":18,"th":"ศุภศิลป์ หนูพิชัย"},{"n":"Pharadon Phatthaphon","c":"SUK","p":"DF","t":"THA","k":19,"th":"ภราดร ภัทรพร"},{"n":"Nalu Jandke","c":"SUK","p":"MF","t":"THA","k":20,"th":"นาลู แจนด์เก"},{"n":"Apichart Denman","c":"SUK","p":"MF","t":"THA","k":21,"th":"อภิชาติ เด่นแม่น"},{"n":"Sarawut Kanlayanabandit","c":"SUK","p":"DF","t":"THA","k":22,"th":"สราวุธ กัลยาณบัณฑิต"},{"n":"Phattharaphon Jansuwan","c":"SUK","p":"MF","t":"THA","k":24,"th":"ภัทรพล จันทร์สุวรรณ"},{"n":"Chaiyaphon Otton","c":"SUK","p":"MF","t":"THA","k":25,"th":"ชัยพล อ๊อตตัน"},{"n":"Thiti Thumporn","c":"SUK","p":"DF","t":"THA","k":27,"th":"ฐิติ ทุมพร"},{"n":"Thitikit Samerjai","c":"SUK","p":"GK","t":"THA","k":28,"th":"ฐิติกิตติ์ เสมอใจ"},{"n":"Phiraphat Khamphaeng","c":"SUK","p":"FW","t":"THA","k":29,"th":"พีรภัทร คำแพง"},{"n":"Athirat Jantrapho","c":"SUK","p":"MF","t":"THA","k":39,"th":"อธิรัฐ จันทรโพธิ์"},{"n":"Mateusinho","c":"SUK","p":"MF","t":"BRA","k":70,"th":"มาเตอุสซินโญ"},{"n":"Cláudio","c":"SUK","p":"DF","t":"BRA","k":93,"th":"เคลาดิโอ"},{"n":"Lucas Barreto","c":"SUK","p":"MF","t":"BRA","k":95,"th":"ลูกัส บาร์เรโต"},{"n":"Kittipun Saensuk","c":"SUK","p":"GK","t":"THA","k":99,"th":"กิตติพันธ์ แสนสุข"},{"n":"Martin Angha","c":"UTT","p":"DF","t":"SUI","k":2,"th":"มาร์ติน อังฮา"},{"n":"Possawee Muanmart","c":"UTT","p":"DF","t":"THA","k":4,"th":"ภาสวีร์ ม่วนมาศ"},{"n":"William Weidersjö","c":"UTT","p":"MF","t":"THA","k":8,"th":"วิลเลียม ไวเดอร์โฌ"},{"n":"Ben Davis","c":"UTT","p":"MF","t":"THA","k":10,"th":"เบน เดวิส"},{"n":"Sumanya Purisai","c":"UTT","p":"MF","t":"THA","k":11,"th":"สุมัญญา ปุริสาย"},{"n":"Amornthep Muangdee","c":"UTT","p":"FW","t":"THA","k":14,"th":"อมรเทพ เมืองดี"},{"n":"Jakkit Wachpirom","c":"UTT","p":"MF","t":"THA","k":17,"th":"จักกิตต์ วัชพิรม"},{"n":"Boonyakait Wongsajaem","c":"UTT","p":"GK","t":"THA","k":18,"th":"บุญยเกียรติ วงศ์ษาแจ่ม"},{"n":"Wattana Playnum","c":"UTT","p":"MF","t":"THA","k":19,"th":"วัฒนา พลายน้ำ"},{"n":"Nonthaphat Naksawad","c":"UTT","p":"FW","t":"THA","k":20,"th":"นนทพัทธ์ นาคสวัสดิ์"},{"n":"Sirimongkol Rattanapoom","c":"UTT","p":"MF","t":"THA","k":21,"th":"สิริมงคล รัตนภูมิ"},{"n":"Kelvin Oliveira","c":"UTT","p":"FW","t":"BRA","k":22,"th":"เคลวิน โอลิเวรา"},{"n":"Chirawat Wangthaphan","c":"UTT","p":"GK","t":"THA","k":26,"th":"จิรวัฒน์ วังทะพันธ์"},{"n":"Harhys Stewart","c":"UTT","p":"MF","t":"SGP","k":30,"th":"ฮาร์ฮีส สจ๊วร์ต"},{"n":"Airfan Doloh","c":"UTT","p":"MF","t":"THA","k":62,"th":"ไอร์ฟาน ดอเลาะ"},{"n":"Thitathorn Aksornsri","c":"UTT","p":"DF","t":"THA","k":65,"th":"ฐิตาธร อักษรศรี"},{"n":"Pavarit Boonmalert","c":"UTT","p":"MF","t":"THA","k":67,"th":"ภาวริศ บุญมาเลิศ"},{"n":"Atikun Mheetuam","c":"UTT","p":"MF","t":"THA","k":92,"th":"อติกันต์ มีท่วม"},{"n":"Ratthanakorn Maikami","c":"UTT","p":"MF","t":"THA","k":null,"th":"รัฐนากร ใหม่คามิ"},{"n":"Siroch Chatthong","c":"UTT","p":"FW","t":"THA","k":null,"th":"ศิโรจน์ ฉัตรทอง"},{"n":"Suporn Peenagatapho","c":"UTT","p":"DF","t":"THA","k":null,"th":"สุพร พีนะกาตาโพธิ์"},{"n":"Arthit Boodjinda","c":"UTT","p":"FW","t":"THA","k":null,"th":"อาทิตย์ บุดจินดา"},{"n":"Warut Mekmusik","c":"AYU","p":"GK","t":"THA","k":1,"th":"วรุตม์ เมฆมุสิก"},{"n":"Hwang Hyun-soo","c":"AYU","p":"DF","t":"KOR","k":2,"th":"ฮวัง ฮยอน-ซู"},{"n":"Atsadawut Changthong","c":"AYU","p":"DF","t":"THA","k":5,"th":"อัษฎาวุธ ช้างทอง"},{"n":"Wellington Priori","c":"AYU","p":"MF","t":"BRA","k":6,"th":"เวลลิงตัน ปริโอรี"},{"n":"Kitphom Bunsan","c":"AYU","p":"DF","t":"THA","k":7,"th":"กิจพร้อม บุญสาร"},{"n":"Nattapon Worasut","c":"AYU","p":"MF","t":"THA","k":8,"th":"ณัฐพล วรสุทธิ์"},{"n":"Kritsana Kasemkulvilai","c":"AYU","p":"FW","t":"THA","k":11,"th":"กฤษณะ เกษมกุลวิไล"},{"n":"Anucha Sakaekum","c":"AYU","p":"MF","t":"THA","k":13,"th":"อนุชา สะแกคำ"},{"n":"Pichitchai Sienkrathok","c":"AYU","p":"DF","t":"THA","k":16,"th":"พิชิตชัย เสียนกระโทก"},{"n":"Chakkit Laptrakul","c":"AYU","p":"MF","t":"THA","k":17,"th":"จักรกฤษณ์ ลาภตระกูล"},{"n":"Passakorn Biaothungnoi","c":"AYU","p":"FW","t":"THA","k":23,"th":"ภาสกร เบี้ยวทุ่งน้อย"},{"n":"Worawut Sataporn","c":"AYU","p":"DF","t":"THA","k":26,"th":"วรวุฒิ สถาพร"},{"n":"Teerath Nakchamnarn","c":"AYU","p":"GK","t":"THA","k":27,"th":"ธีรัช นาคชำนาญ"},{"n":"Natcha Promsomboon","c":"AYU","p":"MF","t":"THA","k":28,"th":"ณัชชา พรหมสมบูรณ์"},{"n":"Sanrawat Dechmitr","c":"AYU","p":"MF","t":"THA","k":29,"th":"สรรวัชญ์ เดชมิตร"},{"n":"Veeraphong Aon-pean","c":"AYU","p":"MF","t":"THA","k":34,"th":"วีรพงศ์ อ่อนเพียร"},{"n":"Bhumchanok Kamkla","c":"AYU","p":"DF","t":"THA","k":47,"th":"ภูมิชนก คำกล้า"},{"n":"Chatnipat Janpong","c":"AYU","p":"DF","t":"THA","k":50,"th":"ฉัตรนิพัทธ์ จันทร์พงษ์"},{"n":"Thanet Suknate","c":"AYU","p":"FW","t":"THA","k":55,"th":"ธเนศ สุขเนตร"},{"n":"Caíque Lemes","c":"AYU","p":"FW","t":"BRA","k":77,"th":"ไกเก เลเมส"},{"n":"Guntapon Keereeleang","c":"AYU","p":"FW","t":"THA","k":null,"th":"กันตพล คีรีเลี้ยง"},{"n":"Warinthon Jamnongwat","c":"AYU","p":"DF","t":"THA","k":null,"th":"วรินทร จำนงวัฒน์"}];
+const DATA_NOTE = "รายชื่อนักเตะ 461 คนจาก 16 สโมสร รวบรวมจากหน้าทีมใน Wikipedia (ส่วนใหญ่อัปเดตราวมกราคม–สิงหาคม 2026) อาจยังไม่ครบการซื้อขายช่วงซัมเมอร์ทั้งหมด ชื่อภาษาไทยถอดจากชื่อภาษาอังกฤษ บางชื่ออาจสะกดต่างจากที่สโมสรใช้ นักเตะที่ไม่มีเบอร์ในข้อมูลจะไม่ถูกสุ่มเป็นนักเตะปริศนา";
+const CLUBS = {
+  BRU:{th:"บุรีรัมย์ ยูไนเต็ด",prov:"บุรีรัมย์",reg:"อีสาน"},
+  BKU:{th:"ทรู แบงค็อก ยูไนเต็ด",prov:"ปทุมธานี",reg:"กทม.-ปริมณฑล"},
+  BGP:{th:"บีจี ปทุม ยูไนเต็ด",prov:"ปทุมธานี",reg:"กทม.-ปริมณฑล"},
+  POR:{th:"การท่าเรือ",prov:"กรุงเทพฯ",reg:"กทม.-ปริมณฑล"},
+  CRU:{th:"เชียงราย ยูไนเต็ด",prov:"เชียงราย",reg:"เหนือ"},
+  CHO:{th:"ชลบุรี",prov:"ชลบุรี",reg:"ตะวันออก"},
+  LWR:{th:"ลำพูน วอริเออร์",prov:"ลำพูน",reg:"เหนือ"},
+  PTN:{th:"ปัตตานี",prov:"ปัตตานี",reg:"ใต้"},
+  PTP:{th:"พีที ประจวบ",prov:"ประจวบคีรีขันธ์",reg:"ตะวันตก"},
+  RSL:{th:"ราษีไศล ยูไนเต็ด",prov:"ศรีสะเกษ",reg:"อีสาน"},
+  RBM:{th:"ราชบุรี",prov:"ราชบุรี",reg:"ตะวันตก"},
+  RAY:{th:"ระยอง",prov:"ระยอง",reg:"ตะวันออก"},
+  SKU:{th:"ศรีสะเกษ ยูไนเต็ด",prov:"ศรีสะเกษ",reg:"อีสาน"},
+  SUK:{th:"สุโขทัย",prov:"สุโขทัย",reg:"เหนือ"},
+  UTT:{th:"อุทัยธานี",prov:"อุทัยธานี",reg:"กลาง"},
+  AYU:{th:"อยุธยา ยูไนเต็ด",prov:"พระนครศรีอยุธยา",reg:"กลาง"}
+};
+const POS = {GK:{th:"ผู้รักษาประตู",s:"GK",i:0},DF:{th:"กองหลัง",s:"DF",i:1},MF:{th:"กองกลาง",s:"MF",i:2},FW:{th:"กองหน้า",s:"FW",i:3}};
+// code: [Thai name, ISO2 for flag, continent]
+const NAT = {
+  THA:["ไทย","TH","AS"],BRA:["บราซิล","BR","SA"],AUS:["ออสเตรเลีย","AU","AS"],PHI:["ฟิลิปปินส์","PH","AS"],
+  ESP:["สเปน","ES","EU"],MNE:["มอนเตเนโกร","ME","EU"],GHA:["กานา","GH","AF"],SRB:["เซอร์เบีย","RS","EU"],
+  GER:["เยอรมนี","DE","EU"],ROU:["โรมาเนีย","RO","EU"],OMA:["โอมาน","OM","AS"],ISR:["อิสราเอล","IL","EU"],
+  KOR:["เกาหลีใต้","KR","AS"],IDN:["อินโดนีเซีย","ID","AS"],IRQ:["อิรัก","IQ","AS"],JPN:["ญี่ปุ่น","JP","AS"],
+  SGP:["สิงคโปร์","SG","AS"],DEN:["เดนมาร์ก","DK","EU"],FRA:["ฝรั่งเศส","FR","EU"],LUX:["ลักเซมเบิร์ก","LU","EU"],
+  SYR:["ซีเรีย","SY","AS"],ENG:["อังกฤษ","ENG","EU"],AUT:["ออสเตรีย","AT","EU"],CAM:["กัมพูชา","KH","AS"],
+  STP:["เซาตูเมฯ","ST","AF"],ARG:["อาร์เจนตินา","AR","SA"],IRN:["อิหร่าน","IR","AS"],NGA:["ไนจีเรีย","NG","AF"],
+  MAS:["มาเลเซีย","MY","AS"],BRU:["บรูไน","BN","AS"],MAD:["มาดากัสการ์","MG","AF"],ALG:["แอลจีเรีย","DZ","AF"],
+  CAN:["แคนาดา","CA","NA"],BOL:["โบลิเวีย","BO","SA"],CMR:["แคเมอรูน","CM","AF"],MLI:["มาลี","ML","AF"],
+  NED:["เนเธอร์แลนด์","NL","EU"],POR:["โปรตุเกส","PT","EU"],SUI:["สวิตเซอร์แลนด์","CH","EU"]
+};
+const MAX = 8;
+
+function flag(code){
+  const iso = (NAT[code]||[])[1]; if(!iso) return "🏳️";
+  if(iso==="ENG") return "\u{1F3F4}\u{E0067}\u{E0062}\u{E0065}\u{E006E}\u{E0067}\u{E007F}";
+  return String.fromCodePoint(...[...iso].map(c=>0x1F1E6+c.charCodeAt(0)-65));
+}
+// Search key: drop Latin accents, and Thai tone marks / karan / mai taikhu so spelling variants still match
+const norm = s => s.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase()
+  .replace(/[็-๎]/g,"").replace(/[^a-z0-9ก-ๆ๐-๙ ]/g,"");
+const disp = p => p.th || p.n;
+PLAYERS.forEach((p,i)=>{p.id=i; p.q=norm(p.n+" "+(p.th||"")+" "+CLUBS[p.c].th+" "+p.c);});
+const POOL = PLAYERS.filter(p=>p.k!=null);
+
+
+const store = {
+  get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+};
+
+let secret, guesses=[], done=false, round=0, recent=[];
+
+function compare(g,s){
+  const gc=CLUBS[g.c], sc=CLUBS[s.c];
+  const club = g.c===s.c?"hit":(gc.prov===sc.prov?"near":"miss");
+  const reg = gc.reg===sc.reg?"hit":"miss";
+  const d = Math.abs(POS[g.p].i-POS[s.p].i);
+  const pos = d===0?"hit":(d===1?"near":"miss");
+  const nat = g.t===s.t?"hit":(NAT[g.t]&&NAT[s.t]&&NAT[g.t][2]===NAT[s.t][2]?"near":"miss");
+  let num="miss", arrow="";
+  if(g.k==null){num="miss";}
+  else if(g.k===s.k){num="hit";}
+  else { if(Math.abs(g.k-s.k)<=3) num="near"; arrow = s.k>g.k?"↑":"↓"; }
+  return {club,reg,pos,nat,num,arrow};
+}
+
+function rowEl(g, animate){
+  const r = compare(g,secret);
+  const el = document.createElement("div"); el.className="row";
+  const tiles = [
+    [r.club,`<b>${g.c}</b><span>${CLUBS[g.c].th}</span>`],
+    [r.reg,`<span>${CLUBS[g.c].reg}</span>`],
+    [r.pos,`<b>${POS[g.p].s}</b><span>${POS[g.p].th}</span>`],
+    [r.nat,`<span class="flag">${flag(g.t)}</span><span>${(NAT[g.t]||[g.t])[0]}</span>`],
+    [r.num,`<span class="num">${g.k==null?"–":g.k}${r.arrow?" "+r.arrow:""}</span>`]
+  ];
+  el.innerHTML = `<div class="who"><span>${esc(disp(g))} <small>${esc(g.n)}</small></span><small>${guesses.indexOf(g)+1}/${MAX}</small></div>
+    <div class="tiles">${tiles.map((t,i)=>`<div class="tile ${t[0]}" style="animation-delay:${animate?i*70:0}ms">${t[1]}</div>`).join("")}</div>`;
+  if(!animate) el.querySelectorAll(".tile").forEach(t=>t.style.animation="none");
+  return el;
+}
+const esc = s => s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+const $ = id => document.getElementById(id);
+const input=$("guess"), sug=$("sug");
+
+function render(){
+  const rows=$("rows"); rows.innerHTML="";
+  [...guesses].reverse().forEach(g=>rows.appendChild(rowEl(g,false)));
+  updateBoard();
+  if(done) showEnd(); else $("end").hidden=true;
+  input.disabled=done;
+  $("giveUp").disabled=done;
+}
+function updateBoard(){
+  const left = MAX-guesses.length;
+  const s = getStats();
+  $("boardKicker").textContent = `รอบที่ ${round} · ชนะติดกัน ${s.streak}`;
+  if(done){
+    $("shirtNum").textContent = secret.k;
+    $("boardQ").textContent = disp(secret);
+    $("boardLeft").textContent = `${CLUBS[secret.c].th} · ${POS[secret.p].th} · ${(NAT[secret.t]||[secret.t])[0]}`;
+  } else {
+    $("shirtNum").textContent = "?";
+    $("boardQ").textContent = "นักเตะคนนี้คือใคร?";
+    $("boardLeft").textContent = `เหลือโอกาสทายอีก ${left} ครั้ง`;
+  }
+}
+
+function submit(p){
+  if(done||!p||guesses.some(g=>g.id===p.id)) return;
+  guesses.push(p);
+  const rows=$("rows");
+  rows.insertBefore(rowEl(p,true), rows.firstChild);
+  const won = p.id===secret.id;
+  input.value=""; closeList();
+  if(won||guesses.length>=MAX) finish(won);
+  else updateBoard();
+}
+function finish(won){
+  done=true; recordStats(won);
+  input.disabled=true; $("giveUp").disabled=true;
+  updateBoard();
+  setTimeout(showEnd, guesses.length?450:0);
+}
+
+const STATS_KEY="tl-endless-stats";
+function getStats(){return store.get(STATS_KEY,{played:0,wins:0,streak:0,best:0});}
+function recordStats(won){
+  const s = getStats();
+  s.played++; if(won){ s.wins++; s.streak++; s.best=Math.max(s.best,s.streak);} else s.streak=0;
+  statsCache=s; store.set(STATS_KEY,s);
+}
+let statsCache=null;
+const _get=getStats; getStats=()=>statsCache||(statsCache=_get());
+
+function shareText(){
+  const won = guesses.some(g=>g.id===secret.id);
+  const sq={hit:"🟩",near:"🟨",miss:"⬜"};
+  const lines = guesses.map(g=>{const r=compare(g,secret);return [r.club,r.reg,r.pos,r.nat,r.num].map(x=>sq[x]).join("");});
+  return `ทายแข้งไทยลีก ${won?guesses.length:"X"}/${MAX}\n${lines.join("\n")}`;
+}
+
+function showEnd(){
+  const won = guesses.some(g=>g.id===secret.id);
+  const end=$("end"); end.hidden=false;
+  const s = getStats();
+  end.innerHTML = `<h2>${won?`ทายถูกใน ${guesses.length} ครั้ง`:(guesses.length>=MAX?"หมดโอกาสแล้ว":"เฉลย")}</h2>
+    <div class="reveal">นักเตะปริศนาคือ <b>${esc(disp(secret))}</b> (${esc(secret.n)}) เบอร์ ${secret.k} ${CLUBS[secret.c].th}</div>
+    <div class="share" id="shareBox">${esc(shareText())}</div>
+    <div class="actions">
+      <button class="btn primary" id="againBtn">เล่นคนต่อไป</button>
+      <button class="btn" id="copyBtn">คัดลอกผลไปแชร์</button>
+    </div>
+    <div class="stats"><div><b>${s.played}</b><span>เล่นแล้ว</span></div><div><b>${s.played?Math.round(s.wins/s.played*100):0}%</b><span>ชนะ</span></div><div><b>${s.streak}</b><span>ชนะติดกัน</span></div><div><b>${s.best}</b><span>ติดกันสูงสุด</span></div></div>`;
+  $("copyBtn").onclick = copyShare;
+  $("againBtn").onclick = newRound;
+  $("againBtn").focus();
+}
+function copyShare(){
+  const t = shareText();
+  const fallback = ()=>{const r=document.createRange();r.selectNodeContents($("shareBox"));const s=getSelection();s.removeAllRanges();s.addRange(r);toast("เลือกข้อความแล้ว กดคัดลอกได้เลย");};
+  try{ navigator.clipboard.writeText(t).then(()=>toast("คัดลอกแล้ว"),fallback);}catch(e){fallback();}
+}
+let tt; function toast(m){const t=$("toast");t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(()=>t.hidden=true,1800);}
+
+// autocomplete
+let matches=[], active=-1;
+function closeList(){sug.hidden=true;input.setAttribute("aria-expanded","false");active=-1;}
+input.addEventListener("input",()=>{
+  const q=norm(input.value.trim());
+  if(q.length<2){closeList();return;}
+  const parts=q.split(" ").filter(Boolean);
+  const starts = p => (norm(p.n).startsWith(parts[0])||norm(p.th||"").startsWith(parts[0]))?0:1;
+  matches = PLAYERS.filter(p=>!guesses.some(g=>g.id===p.id) && parts.every(w=>p.q.includes(w)))
+    .sort((a,b)=>starts(a)-starts(b)||disp(a).localeCompare(disp(b),"th")).slice(0,30);
+  if(!matches.length){sug.innerHTML='<li aria-disabled="true"><span class="cl">ไม่พบนักเตะชื่อนี้ ลองพิมพ์แค่ชื่อต้นหรือนามสกุล</span></li>';}
+  else sug.innerHTML = matches.map((p,i)=>`<li role="option" id="o${i}" data-i="${i}"><span class="nm">${esc(disp(p))}<br><small class="cl">${esc(p.n)}</small></span><span class="cl">${CLUBS[p.c].th}</span></li>`).join("");
+  active = matches.length?0:-1; paintActive();
+  sug.hidden=false; input.setAttribute("aria-expanded","true");
+});
+function paintActive(){[...sug.children].forEach((li,i)=>li.setAttribute("aria-selected",i===active?"true":"false"));if(active>=0){input.setAttribute("aria-activedescendant","o"+active);sug.children[active]?.scrollIntoView({block:"nearest"});}}
+input.addEventListener("keydown",e=>{
+  if(sug.hidden) return;
+  if(e.key==="ArrowDown"){active=Math.min(active+1,matches.length-1);paintActive();e.preventDefault();}
+  else if(e.key==="ArrowUp"){active=Math.max(active-1,0);paintActive();e.preventDefault();}
+  else if(e.key==="Enter"){if(active>=0)submit(matches[active]);e.preventDefault();}
+  else if(e.key==="Escape"){closeList();}
+});
+sug.addEventListener("mousedown",e=>{const li=e.target.closest("li[data-i]");if(li){e.preventDefault();submit(matches[+li.dataset.i]);}});
+document.addEventListener("click",e=>{if(!e.target.closest(".search"))closeList();});
+
+function newRound(){
+  // avoid repeating any of the last 50 secrets
+  let p; do { p = POOL[Math.floor(Math.random()*POOL.length)]; } while(recent.includes(p.id) && recent.length < POOL.length);
+  recent.push(p.id); if(recent.length>50) recent.shift();
+  secret=p; guesses=[]; done=false; round++;
+  window.scrollTo({top:0});
+  render(); input.focus();
+}
+$("giveUp").onclick=()=>{ if(!done) finish(false); };
+// Enter starts the next round, unless it's aimed at an input or a button (those handle it themselves)
+document.addEventListener("keydown",e=>{ if(done && e.key==="Enter" && !e.target.closest("input,button")){ e.preventDefault(); newRound(); }});
+$("dataNote").textContent=DATA_NOTE;
+newRound();
+</script>
+
+</body>
+</html>
