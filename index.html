@@ -163,7 +163,7 @@ details.help summary{cursor:pointer;font-family:var(--display);font-weight:500}
   <details class="help">
     <summary>วิธีเล่น</summary>
     <div class="legend">
-      <div>ทายให้ถูกภายใน 8 ครั้ง เริ่มรอบได้คำใบ้ฟรี 2 ข้อ ทายผิดครบ 3 ครั้งได้เพิ่มอีก 1 ข้อ ครบ 6 ครั้งได้อีก 1 ข้อ และทุกครั้งที่ทายจะได้คำใบ้ 5 ช่อง</div>
+      <div>ทายให้ถูกภายใน 8 ครั้ง เริ่มรอบได้คำใบ้ฟรี 2 ข้อ (อันดับทีม การย้ายทีม อายุ ผลงานในลีก) ทายผิดครบ 3 ครั้งได้เพิ่มอีก 1 ข้อ ครบ 6 ครั้งได้ตัวอักษรแรกของชื่อ และทุกครั้งที่ทายจะได้คำใบ้ 5 ช่อง</div>
       <div><i style="background:var(--hit)"></i>เขียว: ตรงกับนักเตะปริศนา</div>
       <div><i style="background:var(--near)"></i>เหลือง: ใกล้แล้ว สโมสรอยู่จังหวัดเดียวกัน · ตำแหน่งติดกัน · สัญชาติทวีปเดียวกัน · เบอร์ห่างไม่เกิน 3</div>
       <div><i style="background:var(--miss);border:1px solid var(--card-line)"></i>เทา: ไม่ตรง ลูกศร ↑ ↓ บอกว่าเบอร์เสื้อมากหรือน้อยกว่า</div>
@@ -379,26 +379,24 @@ const STANDINGS = {"BRU":1,"PTP":2,"POR":3,"RBM":4,"UTT":5,"BKU":6,"RAY":7,"SKU"
 const ROUNDS_PLAYED = 5;
 // Clue deck for one player: 2 shown at the start, a 3rd after 3 wrong guesses, a 4th after 6
 function buildClues(p){
-  const nat = NAT[p.t]||[p.t];
+  // Clues only use facts that are NOT one of the five guess tiles (club, region, position, nationality, shirt number)
   const r = STANDINGS[p.c];
   const table = r<=4 ? `เล่นให้<b>ทีมหัวตาราง</b> (อันดับ 1–4)` : r<=8 ? `ทีมอยู่<b>ครึ่งบน</b>ของตาราง (อันดับ 5–8)` : r<=13 ? `ทีมอยู่<b>ครึ่งล่าง</b>ของตาราง (อันดับ 9–13)` : `ทีมอยู่<b>โซนตกชั้น</b> (อันดับ 14–16)`;
   const easy = [table], other = [];
   if(p.mv===1) easy.push(`<b>เพิ่งย้ายมา</b>ฤดูกาลนี้ จาก ${esc(p.fr)}`);
   else if(p.mv===3) easy.push(`<b>ยืมตัว</b>มาจาก ${esc(p.fr)}`);
   else if(p.mv===0) other.push(`อยู่กับทีมมา<b>ตั้งแต่ฤดูกาลที่แล้ว</b>`);
-  if(p.t!=="TH") easy.push(`นักเตะต่างชาติ สัญชาติ <b>${flag(p.t)} ${nat[0]}</b>`);
-  else other.push(`สัญชาติ <b>${flag(p.t)} ${nat[0]}</b>`);
-  other.push(`เล่นตำแหน่ง <b>${POS[p.p].th}</b>`);
-  other.push(`สโมสรอยู่ภาค <b>${CLUBS[p.c].reg}</b>`);
   if(p.by) other.push(`อายุราว <b>${2026-p.by}</b> ปี`);
+  if(p.m===0) other.push(`<b>ยังไม่ได้ลงเล่น</b>ในลีกฤดูกาลนี้`);
+  else other.push(`ลงเล่นในลีกไปแล้ว <b>${p.m}</b> จาก ${ROUNDS_PLAYED} นัด`);
   if(p.g>0) easy.push(`ยิงไปแล้ว <b>${p.g}</b> ประตูในลีกฤดูกาลนี้`);
-  else if(p.m===0) other.push(`<b>ยังไม่ได้ลงเล่น</b>ในลีกฤดูกาลนี้`);
-  else other.push(`ลงเล่นในลีก <b>${p.m}</b> จาก ${ROUNDS_PLAYED} นัด ยังไม่มีประตู`);
+  else if(p.m>0) other.push(`ยัง<b>ไม่มีประตู</b>ในลีกฤดูกาลนี้`);
   const shuffle = a => { for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; };
   shuffle(easy); shuffle(other);
-  // start with one hard and one easy clue, then alternate hard/easy as more unlock
+  // alternate hard/easy for the first three; the fourth (after 6 wrong guesses) is always the first letter of the name
   const deck=[]; while(easy.length||other.length){ if(other.length) deck.push(other.shift()); if(easy.length) deck.push(easy.shift()); }
-  return deck;
+  const name = disp(p);
+  return [...deck.slice(0,3), `ชื่อขึ้นต้นด้วย <b>${esc(name[0])}</b>`];
 }
 let roundClues = [], lastShown = 0;
 function cluesShown(){
