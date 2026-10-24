@@ -65,6 +65,13 @@ def title(s):
     return " ".join("-".join(p.capitalize() for p in w.split("-")) for w in s.split())
 
 
+def clean_th(s):
+    """Tidy official Thai names: drop zero-width spaces, doubled marks and vowels typed after a tone mark."""
+    s = re.sub(r"\s+", " ", s or "").replace("​", "").strip()
+    s = re.sub(r"([ัิ-ฺ็-๎])\1+", r"\1", s)
+    return re.sub(r"([่-์])[ัิ-ื]", r"\1", s)
+
+
 def thai_date(d):
     return f"{d.day} {THAI_MONTHS[d.month - 1]} {d.year + 543}"
 
@@ -95,7 +102,7 @@ def update_players():
                 m = p.get("match_count") or 0
                 x = {"id": p["id"], "c": code, "p": p.get("position_short_name") or "MF", "t": nat, "k": int(num),
                      "n": o.get("n") or title(re.sub(r"\s+", " ", p.get("full_name_en") or "").strip()),
-                     "th": o.get("th") if nat != "TH" and o.get("th") else re.sub(r"\s+", " ", p.get("full_name") or "").replace("​", "").strip(),
+                     "th": o.get("th") if nat != "TH" and o.get("th") else clean_th(p.get("full_name")),
                      "by": by, "g": p.get("goal_for") or 0, "m": m}
                 if "mv" in o:
                     x["mv"] = o["mv"]
