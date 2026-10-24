@@ -6,3 +6,14 @@
 - เว็บไฟล์เดียว `index.html` ไม่ต้อง build บน Vercel ตั้ง Framework Preset เป็น **Other**
 - รายชื่อนักเตะครบ 651 คนตามที่ลงทะเบียนกับไทยลีกฤดูกาล 2026/27 (thaileague.co.th, 24 ต.ค. 2569) เยาวชนที่ยังไม่ได้ลงสนามพิมพ์ทายได้แต่ไม่ถูกสุ่มเป็นนักเตะปริศนา
 - เกมโดยแฟนบอล ไม่เกี่ยวข้องกับไทยลีกหรือสโมสรใด
+
+## อัปเดตข้อมูลอัตโนมัติ
+
+GitHub Actions (`.github/workflows/update-data.yml`) ดึงข้อมูลจาก thaileague.co.th แล้ว rebuild `index.html` ให้เอง Vercel จะ deploy ตามทุกครั้งที่มี commit
+
+- รายชื่อนักเตะ ประตู และจำนวนนัด: ทุกวัน 23:00 น. (เวลาไทย)
+- ตารางคะแนน: ทุกวันอังคาร 08:00 น.
+- สั่งรันเองได้ที่แท็บ Actions → Update Thai League data → Run workflow
+
+ชื่อไทยของนักเตะต่างชาติและข้อมูลการย้ายทีมเก็บใน `data/overrides.json` (key คือ id นักเตะของไทยลีก) แก้ไฟล์นี้แล้วรัน `python3 scripts/update.py build` ได้เลย
+ขึ้นฤดูกาลใหม่ต้องแก้ `TOURNAMENT` และ `TEAMS` ใน `scripts/update.py`

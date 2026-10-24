@@ -1,0 +1,412 @@
+<title>ทายแข้งลีกไทย</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,400;0,500;0,700;1,800;1,900&family=IBM+Plex+Sans+Thai:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: night match under floodlights — one narrow column on a dark striped pitch, a glowing halfway line down the middle */
+:root{
+  --night:#07100b; --grass-a:#0d1d14; --grass-b:#0a1810;
+  --card:rgba(16,30,22,.78); --card-line:rgba(120,190,145,.18);
+  --ink:#e9f2ec; --muted:#8fa597; --chalk:rgba(235,245,238,.55);
+  --lime:#4fd37f; --lime-deep:#1e5a37; --lime-glow:rgba(79,211,127,.35);
+  --hit:#2f9a53; --near:#d7a425; --miss:#1d2c23; --miss-ink:#b9c8be;
+  --red:#e2453c; --red-deep:#a92a23;
+  --display:"Kanit","Noto Sans Thai",system-ui,sans-serif;
+  --body:"IBM Plex Sans Thai","Noto Sans Thai",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{background:var(--night)}
+body{
+  min-height:100vh;color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;
+  padding-inline:16px;padding-block:28px 56px;
+  background-color:var(--night);
+  background-image:
+    radial-gradient(ellipse 70% 55% at 50% 0%, rgba(120,200,150,.10), transparent 70%),
+    radial-gradient(ellipse 120% 80% at 50% 50%, transparent 40%, rgba(0,0,0,.65) 100%),
+    linear-gradient(90deg, transparent calc(50% - 7px), rgba(235,245,238,.06) calc(50% - 7px), rgba(235,245,238,.10) 50%, rgba(235,245,238,.06) calc(50% + 7px), transparent calc(50% + 7px)),
+    repeating-linear-gradient(90deg, var(--grass-a) 0 90px, var(--grass-b) 90px 180px);
+  background-attachment:fixed;
+}
+.wrap{max-width:440px;margin:0 auto;display:flex;flex-direction:column;gap:14px;position:relative}
+
+header{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:4px}
+.season{font-family:var(--display);font-size:13px;color:var(--muted);letter-spacing:.02em}
+h1{font-family:var(--display);font-style:italic;font-weight:900;font-size:clamp(32px,9vw,40px);line-height:1;margin:2px 0 0;letter-spacing:-.01em;color:var(--ink)}
+h1 span{color:var(--lime);text-shadow:0 0 18px var(--lime-glow)}
+
+.giveup{display:inline-flex;align-items:center;gap:7px;font:600 14px var(--display);color:#fff;background:linear-gradient(180deg,var(--red),var(--red-deep));border:1px solid rgba(255,140,130,.35);padding:8px 13px;border-radius:9px;cursor:pointer;box-shadow:0 4px 16px rgba(226,69,60,.25)}
+.giveup svg{width:15px;height:15px}
+.giveup:hover{filter:brightness(1.08)}
+.giveup:disabled{opacity:.4;cursor:default;box-shadow:none;filter:grayscale(.4)}
+button:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid var(--near);outline-offset:2px}
+
+.status{display:flex;justify-content:space-between;align-items:center;gap:10px;font-family:var(--display);font-size:14px;color:var(--muted)}
+.status b{color:var(--ink);font-weight:500;font-variant-numeric:tabular-nums}
+.status .streak b{color:var(--lime)}
+
+.board{position:relative;overflow:hidden;border-radius:14px;padding:16px 18px;display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center;color:var(--ink);
+  background:linear-gradient(135deg,#2a6b45 0%,#1b4a30 55%,#143a25 100%);
+  border:1px solid rgba(140,220,170,.35);box-shadow:0 0 0 1px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.08)}
+.board .marks{position:absolute;inset:0;pointer-events:none}
+.board .marks svg{position:absolute;right:0;top:0;height:100%;width:auto}
+.board::after{content:"";position:absolute;right:-30px;top:-40px;width:120px;height:90px;background:radial-gradient(closest-side,rgba(255,255,255,.35),transparent);pointer-events:none}
+.shirt{width:64px;height:64px;position:relative;z-index:1}
+.shirt svg{width:100%;height:100%}
+.board-text{min-width:0;position:relative;z-index:1}
+.board-text .k{font-family:var(--display);font-size:13px;color:rgba(233,242,236,.75)}
+.board-text .q{font-family:var(--display);font-weight:700;font-size:22px;line-height:1.2;text-wrap:balance}
+.board-text .left{font-size:13px;color:rgba(233,242,236,.8);margin-top:2px}
+.board-text .hints{display:flex;flex-direction:column;align-items:flex-start;gap:5px;margin-top:7px}
+.board-text .hint{display:inline-block;font-size:13px;line-height:1.35;background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.14);border-radius:12px;padding:3px 10px}
+.board-text .hint.new{animation:pop .4s ease}
+@keyframes pop{from{transform:scale(.9);opacity:0}to{transform:none;opacity:1}}
+.board-text .next{font-size:12px;color:rgba(233,242,236,.6)}
+.board-text .hint b{font-family:var(--display);font-weight:500;color:#fff}
+
+.search{position:relative;margin-top:4px}
+.search label{display:block;margin-bottom:6px;font-size:13px;color:var(--muted)}
+.search input{width:100%;font:500 16px var(--body);padding:14px 16px;border-radius:11px;color:var(--ink);background:rgba(8,16,11,.85);border:1.5px solid rgba(233,242,236,.55);box-shadow:0 0 0 3px rgba(233,242,236,.06),0 0 22px rgba(233,242,236,.12)}
+.search input::placeholder{color:#6f8577}
+.search input:focus{outline:none;border-color:var(--lime);box-shadow:0 0 0 3px rgba(79,211,127,.18),0 0 24px var(--lime-glow)}
+.search input:disabled{opacity:.5}
+.list{position:absolute;left:0;right:0;top:calc(100% + 6px);background:#0f1d15;border:1px solid var(--card-line);border-radius:11px;max-height:300px;overflow-y:auto;z-index:5;box-shadow:0 14px 34px rgba(0,0,0,.55);margin:0;padding:4px;list-style:none}
+.list li{padding:9px 10px;border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.list li[aria-selected="true"],.list li:hover{background:#1c3226}
+.list .nm{font-weight:600;min-width:0}
+.list .cl{color:var(--muted);font-size:12px;white-space:nowrap;font-weight:400}
+
+.colhead,.tiles{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.colhead{font-family:var(--display);font-size:12px;color:var(--muted);text-align:center;padding-top:4px}
+.rows{display:flex;flex-direction:column;gap:12px}
+.row{display:flex;flex-direction:column;gap:6px}
+.row .who{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-weight:600}
+.row .who small{font-family:var(--mono);color:var(--muted);font-weight:500;font-size:11px}
+.tile{border-radius:9px;min-height:58px;padding:6px 4px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-size:11.5px;line-height:1.25;background:var(--miss);color:var(--miss-ink);border:1px solid rgba(255,255,255,.05);animation:flip .35s ease both}
+.tile b{font-family:var(--display);font-weight:700;font-size:15px;line-height:1.1}
+.tile .num{font-family:var(--mono);font-size:18px;font-weight:600;font-variant-numeric:tabular-nums}
+.tile.hit{background:var(--hit);color:#fff;box-shadow:0 0 14px rgba(47,154,83,.35)}
+.tile.near{background:var(--near);color:#241a00}
+.tile .flag{font-size:20px;line-height:1}
+@keyframes flip{from{transform:rotateX(90deg)}to{transform:none}}
+@media (prefers-reduced-motion: reduce){.tile{animation:none}}
+
+.end{background:var(--card);backdrop-filter:blur(6px);border:1px solid var(--card-line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.end h2{font-family:var(--display);font-weight:700;font-size:22px;margin:0}
+.end .actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{font:600 14px var(--display);border:1px solid var(--card-line);background:rgba(255,255,255,.04);color:var(--ink);padding:9px 14px;border-radius:9px;cursor:pointer}
+.btn.primary{background:linear-gradient(180deg,#38b066,#23804a);border-color:rgba(140,230,175,.4);color:#fff;box-shadow:0 4px 16px rgba(47,154,83,.3)}
+.share{font-family:var(--mono);white-space:pre;background:rgba(0,0,0,.35);border-radius:9px;padding:10px;font-size:13px;overflow-x:auto}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center}
+.stats div{display:flex;flex-direction:column}
+.stats b{font-family:var(--display);font-size:24px;font-variant-numeric:tabular-nums}
+.stats span{font-size:12px;color:var(--muted)}
+
+details.help{background:var(--card);backdrop-filter:blur(6px);border:1px solid var(--card-line);border-radius:12px;padding:13px 16px}
+details.help summary{cursor:pointer;font-family:var(--display);font-weight:500}
+.legend{display:flex;flex-direction:column;gap:7px;margin-top:10px;font-size:14px;color:#cfdcd3}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:6px}
+.note{font-size:12px;color:var(--muted);line-height:1.7;margin:4px 0 0}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--night);padding:9px 14px;border-radius:9px;font-size:14px;z-index:10}
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <div class="season">ไทยลีก 1 · ฤดูกาล 2026/27</div>
+      <h1>ทาย<span>แข้ง</span>ลีกไทย</h1>
+    </div>
+    <button class="giveup" id="giveUp"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 15V1.5M3 2h9l-2 3 2 3H3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></svg>ยอมแพ้ ดูเฉลย</button>
+  </header>
+
+  <div class="status" aria-live="polite">
+    <span class="streak">ชนะติดกัน <b id="streakNo">0</b></span>
+    <span>สถิติสูงสุด <b id="bestNo">0</b></span>
+  </div>
+
+  <section class="board" aria-live="polite">
+    <div class="marks" aria-hidden="true">
+      <svg viewBox="0 0 120 100" preserveAspectRatio="xMaxYMid meet"><g fill="none" stroke="rgba(255,255,255,.16)" stroke-width="1.4"><path d="M120 22 H92 V78 H120"/><path d="M120 38 H108 V62 H120"/><path d="M92 36 A16 16 0 0 0 92 64"/><circle cx="20" cy="50" r="34"/></g></svg>
+    </div>
+    <div class="shirt" aria-hidden="true">
+      <svg viewBox="0 0 100 100"><path d="M34 12 L20 18 L6 34 L18 46 L26 40 L26 90 L74 90 L74 40 L82 46 L94 34 L80 18 L66 12 Q50 24 34 12 Z" fill="none" stroke="rgba(255,255,255,.85)" stroke-width="3" stroke-linejoin="round"/><text x="50" y="72" text-anchor="middle" font-family="Kanit, sans-serif" font-weight="700" font-size="32" fill="#fff" id="shirtNum">?</text></svg>
+    </div>
+    <div class="board-text">
+      <div class="q" id="boardQ">นักเตะคนนี้คือใคร?</div>
+      <div class="hints" id="boardHint" aria-live="polite"></div>
+      <div class="left" id="boardLeft"></div>
+    </div>
+  </section>
+
+  <div class="search">
+    <label for="guess">พิมพ์ชื่อนักเตะหรือชื่อสโมสร ได้ทั้งภาษาไทยและอังกฤษ</label>
+    <input id="guess" type="text" autocomplete="off" placeholder="เช่น ธีรศิลป์, ชนาธิป, ศุภชัย" role="combobox" aria-expanded="false" aria-controls="sug" aria-autocomplete="list">
+    <ul class="list" id="sug" role="listbox" hidden></ul>
+  </div>
+
+  <div class="colhead" aria-hidden="true"><div>สโมสร</div><div>ภาค</div><div>ตำแหน่ง</div><div>สัญชาติ</div><div>เบอร์</div></div>
+  <div class="rows" id="rows"></div>
+
+  <section class="end" id="end" hidden></section>
+
+  <details class="help">
+    <summary>วิธีเล่น</summary>
+    <div class="legend">
+      <div>ทายให้ถูกภายใน 8 ครั้ง เริ่มรอบได้คำใบ้ฟรี 2 ข้อ ทายผิดครบ 3 ครั้งได้เพิ่มอีก 1 ข้อ ครบ 6 ครั้งได้อีก 1 ข้อ และทุกครั้งที่ทายจะได้คำใบ้ 5 ช่อง</div>
+      <div><i style="background:var(--hit)"></i>เขียว: ตรงกับนักเตะปริศนา</div>
+      <div><i style="background:var(--near)"></i>เหลือง: ใกล้แล้ว สโมสรอยู่จังหวัดเดียวกัน · ตำแหน่งติดกัน · สัญชาติทวีปเดียวกัน · เบอร์ห่างไม่เกิน 3</div>
+      <div><i style="background:var(--miss);border:1px solid var(--card-line)"></i>เทา: ไม่ตรง ลูกศร ↑ ↓ บอกว่าเบอร์เสื้อมากหรือน้อยกว่า</div>
+      <div>ทายจบแล้วกด "เล่นคนต่อไป" หรือ Enter เพื่อสุ่มนักเตะคนใหม่ เล่นได้ไม่จำกัด</div>
+    </div>
+  </details>
+  <p class="note" id="dataNote"></p>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+const PLAYERS = __PLAYERS__;
+const DATA_NOTE = "รายชื่อนักเตะ __COUNT__ คนจาก 16 สโมสร ครบตามที่ลงทะเบียนกับไทยลีกฤดูกาล 2026/27 (thaileague.co.th) อัปเดตรายชื่อล่าสุด __PLAYERS_DATE__ ตารางคะแนนล่าสุด __TABLE_DATE__ นักเตะเยาวชนที่ยังไม่ได้ลงสนามพิมพ์ทายได้ แต่จะไม่ถูกสุ่มเป็นนักเตะปริศนา";
+const CLUBS = {
+  BRU:{th:"บุรีรัมย์ ยูไนเต็ด",prov:"บุรีรัมย์",reg:"อีสาน"},
+  BKU:{th:"ทรู แบงค็อก ยูไนเต็ด",prov:"ปทุมธานี",reg:"กทม.-ปริมณฑล"},
+  BGP:{th:"บีจี ปทุม ยูไนเต็ด",prov:"ปทุมธานี",reg:"กทม.-ปริมณฑล"},
+  POR:{th:"การท่าเรือ",prov:"กรุงเทพฯ",reg:"กทม.-ปริมณฑล"},
+  CRU:{th:"เชียงราย ยูไนเต็ด",prov:"เชียงราย",reg:"เหนือ"},
+  CHO:{th:"ชลบุรี",prov:"ชลบุรี",reg:"ตะวันออก"},
+  LWR:{th:"ลำพูน วอริเออร์",prov:"ลำพูน",reg:"เหนือ"},
+  PTN:{th:"ปัตตานี",prov:"ปัตตานี",reg:"ใต้"},
+  PTP:{th:"พีที ประจวบ",prov:"ประจวบคีรีขันธ์",reg:"ตะวันตก"},
+  RSL:{th:"ราษีไศล ยูไนเต็ด",prov:"ศรีสะเกษ",reg:"อีสาน"},
+  RBM:{th:"ราชบุรี",prov:"ราชบุรี",reg:"ตะวันตก"},
+  RAY:{th:"ระยอง",prov:"ระยอง",reg:"ตะวันออก"},
+  SKU:{th:"ศรีสะเกษ ยูไนเต็ด",prov:"ศรีสะเกษ",reg:"อีสาน"},
+  SUK:{th:"สุโขทัย",prov:"สุโขทัย",reg:"เหนือ"},
+  UTT:{th:"อุทัยธานี",prov:"อุทัยธานี",reg:"กลาง"},
+  AYU:{th:"อยุธยา ยูไนเต็ด",prov:"พระนครศรีอยุธยา",reg:"กลาง"}
+};
+const POS = {GK:{th:"ผู้รักษาประตู",s:"GK",i:0},DF:{th:"กองหลัง",s:"DF",i:1},MF:{th:"กองกลาง",s:"MF",i:2},FW:{th:"กองหน้า",s:"FW",i:3}};
+// code: [Thai name, ISO2 for flag, continent]
+const MAX = 8; // guesses per round
+const NAT = {
+  TH:["ไทย","AS"],BR:["บราซิล","SA"],ES:["สเปน","EU"],PH:["ฟิลิปปินส์","AS"],DE:["เยอรมนี","EU"],
+  RS:["เซอร์เบีย","EU"],DK:["เดนมาร์ก","EU"],GB:["สหราชอาณาจักร","EU"],FR:["ฝรั่งเศส","EU"],AU:["ออสเตรเลีย","AS"],
+  LU:["ลักเซมเบิร์ก","EU"],OM:["โอมาน","AS"],PT:["โปรตุเกส","EU"],JP:["ญี่ปุ่น","AS"],MY:["มาเลเซีย","AS"],
+  AT:["ออสเตรีย","EU"],MG:["มาดากัสการ์","AF"],PL:["โปแลนด์","EU"],KR:["เกาหลีใต้","AS"],BA:["บอสเนียฯ","EU"],
+  SG:["สิงคโปร์","AS"],CO:["โคลอมเบีย","SA"],HR:["โครเอเชีย","EU"],SY:["ซีเรีย","AS"],RO:["โรมาเนีย","EU"],
+  GH:["กานา","AF"],CM:["แคเมอรูน","AF"],NL:["เนเธอร์แลนด์","EU"],NG:["ไนจีเรีย","AF"],AR:["อาร์เจนตินา","SA"],
+  BG:["บัลแกเรีย","EU"]
+};
+function flag(iso){
+  if(!iso || iso.length!==2) return "🏳️";
+  return String.fromCodePoint(...[...iso].map(c=>0x1F1E6+c.charCodeAt(0)-65));
+}
+// Search key: drop Latin accents, and Thai tone marks / karan / mai taikhu so spelling variants still match
+const norm = s => s.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase()
+  .replace(/[็-๎]/g,"").replace(/[^a-z0-9ก-ๆ๐-๙ ]/g,"");
+const disp = p => p.th || p.n;
+PLAYERS.forEach((p,i)=>{p.id=i; p.q=norm(p.n+" "+(p.th||"")+" "+CLUBS[p.c].th+" "+p.c);});
+const POOL = PLAYERS.filter(p=>p.k!=null && !p.y); // youth who have not played can be guessed but are never the mystery player
+
+
+const store = {
+  get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+};
+
+let secret, guesses=[], done=false, round=0, recent=[];
+
+function compare(g,s){
+  const gc=CLUBS[g.c], sc=CLUBS[s.c];
+  const club = g.c===s.c?"hit":(gc.prov===sc.prov?"near":"miss");
+  const reg = gc.reg===sc.reg?"hit":"miss";
+  const d = Math.abs(POS[g.p].i-POS[s.p].i);
+  const pos = d===0?"hit":(d===1?"near":"miss");
+  const nat = g.t===s.t?"hit":(NAT[g.t]&&NAT[s.t]&&NAT[g.t][1]===NAT[s.t][1]?"near":"miss");
+  let num="miss", arrow="";
+  if(g.k==null){num="miss";}
+  else if(g.k===s.k){num="hit";}
+  else { if(Math.abs(g.k-s.k)<=3) num="near"; arrow = s.k>g.k?"↑":"↓"; }
+  return {club,reg,pos,nat,num,arrow};
+}
+
+function rowEl(g, animate){
+  const r = compare(g,secret);
+  const el = document.createElement("div"); el.className="row";
+  const tiles = [
+    [r.club,`<b>${g.c}</b><span>${CLUBS[g.c].th}</span>`],
+    [r.reg,`<span>${CLUBS[g.c].reg}</span>`],
+    [r.pos,`<b>${POS[g.p].s}</b><span>${POS[g.p].th}</span>`],
+    [r.nat,`<span class="flag">${flag(g.t)}</span><span>${(NAT[g.t]||[g.t])[0]}</span>`],
+    [r.num,`<span class="num">${g.k==null?"–":g.k}${r.arrow?" "+r.arrow:""}</span>`]
+  ];
+  el.innerHTML = `<div class="who"><span>${esc(disp(g))} <small>${esc(g.n)}</small></span><small>${guesses.indexOf(g)+1}/${MAX}</small></div>
+    <div class="tiles">${tiles.map((t,i)=>`<div class="tile ${t[0]}" style="animation-delay:${animate?i*70:0}ms">${t[1]}</div>`).join("")}</div>`;
+  if(!animate) el.querySelectorAll(".tile").forEach(t=>t.style.animation="none");
+  return el;
+}
+const esc = s => s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+const $ = id => document.getElementById(id);
+const input=$("guess"), sug=$("sug");
+
+function render(){
+  const rows=$("rows"); rows.innerHTML="";
+  [...guesses].reverse().forEach(g=>rows.appendChild(rowEl(g,false)));
+  updateBoard();
+  if(done) showEnd(); else $("end").hidden=true;
+  input.disabled=done;
+  $("giveUp").disabled=done;
+}
+function updateBoard(){
+  const left = MAX-guesses.length;
+  const s = getStats();
+  $("streakNo").textContent = s.streak;
+  $("bestNo").textContent = s.best;
+  const hint = $("boardHint");
+  if(done){
+    $("shirtNum").textContent = secret.k;
+    $("boardQ").textContent = disp(secret);
+    hint.hidden = true;
+    $("boardLeft").textContent = `${CLUBS[secret.c].th} · ${POS[secret.p].th} · ${(NAT[secret.t]||[secret.t])[0]}`;
+  } else {
+    $("shirtNum").textContent = "?";
+    $("boardQ").textContent = "นักเตะคนนี้คือใคร?";
+    hint.hidden = false;
+    const shown = cluesShown();
+    hint.innerHTML = roundClues.slice(0, shown).map((c,i)=>`<span class="hint${i>=lastShown?' new':''}">${c}</span>`).join("")
+      + (shown < roundClues.length && shown < 4 ? `<span class="next">คำใบ้ถัดไปเปิดเมื่อทายผิดครบ ${shown===2?3:6} ครั้ง</span>` : "");
+    lastShown = shown;
+    $("boardLeft").textContent = `เหลือโอกาสทายอีก ${left} ครั้ง`;
+  }
+}
+
+function submit(p){
+  if(done||!p||guesses.some(g=>g.id===p.id)) return;
+  guesses.push(p);
+  const rows=$("rows");
+  rows.insertBefore(rowEl(p,true), rows.firstChild);
+  const won = p.id===secret.id;
+  input.value=""; closeList();
+  if(won||guesses.length>=MAX) finish(won);
+  else updateBoard();
+}
+function finish(won){
+  done=true; recordStats(won);
+  input.disabled=true; $("giveUp").disabled=true;
+  updateBoard();
+  setTimeout(showEnd, guesses.length?450:0);
+}
+
+const STATS_KEY="tl-endless-stats";
+function getStats(){return store.get(STATS_KEY,{played:0,wins:0,streak:0,best:0});}
+function recordStats(won){
+  const s = getStats();
+  s.played++; if(won){ s.wins++; s.streak++; s.best=Math.max(s.best,s.streak);} else s.streak=0;
+  statsCache=s; store.set(STATS_KEY,s);
+}
+let statsCache=null;
+const _get=getStats; getStats=()=>statsCache||(statsCache=_get());
+
+function shareText(){
+  const won = guesses.some(g=>g.id===secret.id);
+  const sq={hit:"🟩",near:"🟨",miss:"⬜"};
+  const lines = guesses.map(g=>{const r=compare(g,secret);return [r.club,r.reg,r.pos,r.nat,r.num].map(x=>sq[x]).join("");});
+  return `ทายแข้งลีกไทย ${won?guesses.length:"X"}/${MAX}\n${lines.join("\n")}`;
+}
+
+function showEnd(){
+  const won = guesses.some(g=>g.id===secret.id);
+  const end=$("end"); end.hidden=false;
+  const s = getStats();
+  end.innerHTML = `<h2>${won?`ทายถูกใน ${guesses.length} ครั้ง`:(guesses.length>=MAX?"หมดโอกาสแล้ว":"เฉลย")}</h2>
+    <div class="reveal">นักเตะปริศนาคือ <b>${esc(disp(secret))}</b> (${esc(secret.n)}) เบอร์ ${secret.k} ${CLUBS[secret.c].th}</div>
+    <div class="share" id="shareBox">${esc(shareText())}</div>
+    <div class="actions">
+      <button class="btn primary" id="againBtn">เล่นคนต่อไป</button>
+      <button class="btn" id="copyBtn">คัดลอกผลไปแชร์</button>
+    </div>
+    <div class="stats"><div><b>${s.played}</b><span>เล่นแล้ว</span></div><div><b>${s.played?Math.round(s.wins/s.played*100):0}%</b><span>ชนะ</span></div><div><b>${s.streak}</b><span>ชนะติดกัน</span></div><div><b>${s.best}</b><span>ติดกันสูงสุด</span></div></div>`;
+  $("copyBtn").onclick = copyShare;
+  $("againBtn").onclick = newRound;
+  $("againBtn").focus();
+}
+function copyShare(){
+  const t = shareText();
+  const fallback = ()=>{const r=document.createRange();r.selectNodeContents($("shareBox"));const s=getSelection();s.removeAllRanges();s.addRange(r);toast("เลือกข้อความแล้ว กดคัดลอกได้เลย");};
+  try{ navigator.clipboard.writeText(t).then(()=>toast("คัดลอกแล้ว"),fallback);}catch(e){fallback();}
+}
+let tt; function toast(m){const t=$("toast");t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(()=>t.hidden=true,1800);}
+
+// autocomplete
+let matches=[], active=-1;
+function closeList(){sug.hidden=true;input.setAttribute("aria-expanded","false");active=-1;}
+input.addEventListener("input",()=>{
+  const q=norm(input.value.trim());
+  if(q.length<2){closeList();return;}
+  const parts=q.split(" ").filter(Boolean);
+  const starts = p => (norm(p.n).startsWith(parts[0])||norm(p.th||"").startsWith(parts[0]))?0:1;
+  matches = PLAYERS.filter(p=>!guesses.some(g=>g.id===p.id) && parts.every(w=>p.q.includes(w)))
+    .sort((a,b)=>starts(a)-starts(b)||disp(a).localeCompare(disp(b),"th")).slice(0,30);
+  if(!matches.length){sug.innerHTML='<li aria-disabled="true"><span class="cl">ไม่พบนักเตะชื่อนี้ ลองพิมพ์แค่ชื่อต้นหรือนามสกุล</span></li>';}
+  else sug.innerHTML = matches.map((p,i)=>`<li role="option" id="o${i}" data-i="${i}"><span class="nm">${esc(disp(p))}<br><small class="cl">${esc(p.n)}</small></span><span class="cl">${CLUBS[p.c].th}</span></li>`).join("");
+  active = matches.length?0:-1; paintActive();
+  sug.hidden=false; input.setAttribute("aria-expanded","true");
+});
+function paintActive(){[...sug.children].forEach((li,i)=>li.setAttribute("aria-selected",i===active?"true":"false"));if(active>=0){input.setAttribute("aria-activedescendant","o"+active);sug.children[active]?.scrollIntoView({block:"nearest"});}}
+input.addEventListener("keydown",e=>{
+  if(sug.hidden) return;
+  if(e.key==="ArrowDown"){active=Math.min(active+1,matches.length-1);paintActive();e.preventDefault();}
+  else if(e.key==="ArrowUp"){active=Math.max(active-1,0);paintActive();e.preventDefault();}
+  else if(e.key==="Enter"){if(active>=0)submit(matches[active]);e.preventDefault();}
+  else if(e.key==="Escape"){closeList();}
+});
+sug.addEventListener("mousedown",e=>{const li=e.target.closest("li[data-i]");if(li){e.preventDefault();submit(matches[+li.dataset.i]);}});
+document.addEventListener("click",e=>{if(!e.target.closest(".search"))closeList();});
+
+// League table snapshot used for the "team position" clue (thaileague.co.th, after 5 rounds)
+const STANDINGS = __STANDINGS__;
+const ROUNDS_PLAYED = __ROUNDS__;
+// Clue deck for one player: 2 shown at the start, a 3rd after 3 wrong guesses, a 4th after 6
+function buildClues(p){
+  const nat = NAT[p.t]||[p.t];
+  const r = STANDINGS[p.c];
+  const table = r<=4 ? `เล่นให้<b>ทีมหัวตาราง</b> (อันดับ 1–4)` : r<=8 ? `ทีมอยู่<b>ครึ่งบน</b>ของตาราง (อันดับ 5–8)` : r<=13 ? `ทีมอยู่<b>ครึ่งล่าง</b>ของตาราง (อันดับ 9–13)` : `ทีมอยู่<b>โซนตกชั้น</b> (อันดับ 14–16)`;
+  const easy = [table], other = [];
+  if(p.mv===1) easy.push(`<b>เพิ่งย้ายมา</b>ฤดูกาลนี้ จาก ${esc(p.fr)}`);
+  else if(p.mv===3) easy.push(`<b>ยืมตัว</b>มาจาก ${esc(p.fr)}`);
+  else if(p.mv===0) other.push(`อยู่กับทีมมา<b>ตั้งแต่ฤดูกาลที่แล้ว</b>`);
+  if(p.t!=="TH") easy.push(`นักเตะต่างชาติ สัญชาติ <b>${flag(p.t)} ${nat[0]}</b>`);
+  else other.push(`สัญชาติ <b>${flag(p.t)} ${nat[0]}</b>`);
+  other.push(`เล่นตำแหน่ง <b>${POS[p.p].th}</b>`);
+  other.push(`สโมสรอยู่ภาค <b>${CLUBS[p.c].reg}</b>`);
+  if(p.by) other.push(`อายุราว <b>${2026-p.by}</b> ปี`);
+  if(p.g>0) easy.push(`ยิงไปแล้ว <b>${p.g}</b> ประตูในลีกฤดูกาลนี้`);
+  else if(p.m===0) other.push(`<b>ยังไม่ได้ลงเล่น</b>ในลีกฤดูกาลนี้`);
+  else other.push(`ลงเล่นในลีก <b>${p.m}</b> จาก ${ROUNDS_PLAYED} นัด ยังไม่มีประตู`);
+  const shuffle = a => { for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; };
+  shuffle(easy); shuffle(other);
+  // start with one hard and one easy clue, then alternate hard/easy as more unlock
+  const deck=[]; while(easy.length||other.length){ if(other.length) deck.push(other.shift()); if(easy.length) deck.push(easy.shift()); }
+  return deck;
+}
+let roundClues = [], lastShown = 0;
+function cluesShown(){
+  const wrong = guesses.filter(g=>g.id!==secret.id).length;
+  return Math.min(roundClues.length, 2 + (wrong>=3?1:0) + (wrong>=6?1:0));
+}
+function newRound(){
+  // avoid repeating any of the last 50 secrets
+  let p; do { p = POOL[Math.floor(Math.random()*POOL.length)]; } while(recent.includes(p.id) && recent.length < POOL.length);
+  recent.push(p.id); if(recent.length>50) recent.shift();
+  secret=p; guesses=[]; done=false; round++;
+  roundClues = buildClues(p); lastShown = 0;
+  window.scrollTo({top:0});
+  render(); input.focus();
+}
+$("giveUp").onclick=()=>{ if(!done) finish(false); };
+// Enter starts the next round, unless it's aimed at an input or a button (those handle it themselves)
+document.addEventListener("keydown",e=>{ if(done && e.key==="Enter" && !e.target.closest("input,button")){ e.preventDefault(); newRound(); }});
+$("dataNote").textContent=DATA_NOTE;
+newRound();
+</script>

@@ -1,0 +1,22 @@
+{
+ "updated": "2026-10-24",
+ "rounds": 5,
+ "ranks": {
+  "BRU": 1,
+  "PTP": 2,
+  "POR": 3,
+  "RBM": 4,
+  "UTT": 5,
+  "BKU": 6,
+  "RAY": 7,
+  "SKU": 8,
+  "AYU": 9,
+  "BGP": 10,
+  "SUK": 11,
+  "CRU": 12,
+  "LWR": 13,
+  "PTN": 14,
+  "RSL": 15,
+  "CHO": 16
+ }
+}

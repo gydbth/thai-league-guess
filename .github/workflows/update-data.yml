@@ -1,0 +1,52 @@
+name: Update Thai League data
+
+on:
+  schedule:
+    - cron: "0 16 * * *"   # every day 23:00 Bangkok (16:00 UTC): squads, goals, appearances
+    - cron: "0 1 * * 2"    # every Tuesday 08:00 Bangkok (01:00 UTC): league table
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "players or standings"
+        default: players
+        type: choice
+        options: [players, standings]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-data
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Pick what to update
+        id: mode
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "mode=${{ inputs.mode }}" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event.schedule }}" = "0 1 * * 2" ]; then
+            echo "mode=standings" >> "$GITHUB_OUTPUT"
+          else
+            echo "mode=players" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Fetch from thaileague.co.th and rebuild
+        run: python3 scripts/update.py ${{ steps.mode.outputs.mode }}
+
+      - name: Commit if anything changed
+        run: |
+          git config user.name "thai-league-guess-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data index.html
+          if git diff --cached --quiet; then
+            echo "No changes"
+          else
+            git commit -m "Auto-update ${{ steps.mode.outputs.mode }} $(TZ=Asia/Bangkok date +%Y-%m-%d)"
+            git push
+          fi
