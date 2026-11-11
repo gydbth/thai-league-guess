@@ -74,9 +74,10 @@ Python's http.server can't start inside ~/Documents from the app, so use the Nod
   name from the API; foreign clubs keep their English name. ~40 pool players (mostly academy kids
   not on Transfermarkt) are still `mv: 2`.
 - Foreign players' Thai names (`th` in overrides): the owner wants the spelling Thai media and club
-  pages use (e.g. "เปาลินโญ่", "นาธาน เปไล"), NOT Thai Wikipedia's Royal Institute spelling. Only 23 of
-  160 were checked against Google results in Nov 2026 (BRU, BGP and two POR); the rest are unverified.
-  Bulk automated Google searching is blocked as bot-check circumvention: check names one by one.
+  pages use (e.g. "เปาลินโญ่", "นาธาน เปไล"), NOT Thai Wikipedia's Royal Institute spelling. All 160 were
+  checked against Google results team by team in Nov 2026 (80 changed). About 11 rest on only 1-2 hits
+  and ~15 names were not found in Thai media at all (kept as they were). Background bulk fetching of
+  Google is blocked as bot-check circumvention: search with normal page loads, one player at a time.
 - New season: update `TOURNAMENT`, `SEASON_START` and `TEAMS` in `scripts/update.py`, rerun `make_og.py`, `STANDINGS` placeholder data,
   the season text in the template, and check club codes/regions in the template's `CLUBS`.
 - Commit messages in English; the bot's daily "Auto-update" commits are expected.
