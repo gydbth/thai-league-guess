@@ -383,8 +383,9 @@ const EASY_POOL = POOL.filter(p=>p.m>=EASY_MIN);
 function buildClues(p){
   // Clues only use facts that are NOT one of the five guess tiles (club, region, position, nationality, shirt number)
   const easy = [], other = [];
-  if(p.mv===1) easy.push(`<b>เพิ่งย้ายมา</b>ฤดูกาลนี้ จาก ${esc(p.fr)}`);
+  if(p.mv===1) easy.push(p.fr ? `<b>เพิ่งย้ายมา</b>ฤดูกาลนี้ จาก ${esc(p.fr)}` : `<b>เพิ่งย้ายมา</b>ฤดูกาลนี้ (ไม่มีสังกัดก่อนหน้า)`);
   else if(p.mv===3) easy.push(`<b>ยืมตัว</b>มาจาก ${esc(p.fr)}`);
+  else if(p.mv===4) easy.push(`<b>กลับจากถูกปล่อยยืม</b>ให้ ${esc(p.fr)}`);
   else if(p.mv===0) other.push(`อยู่กับทีมมา<b>ตั้งแต่ฤดูกาลที่แล้ว</b>`);
   if(p.by) other.push(`อายุราว <b>${SEASON_START-p.by}</b> ปี`);
   if(p.m===0) other.push(`<b>ยังไม่ได้ลงเล่น</b>ในลีกฤดูกาลนี้`);

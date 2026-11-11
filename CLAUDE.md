@@ -31,7 +31,7 @@ reply in Thai, keep it short, and talk about results rather than process.
 | `scripts/game-template.html` | The game (CSS + markup + JS). Edit the game here, never in `index.html`. Placeholders: `__PLAYERS__ __COUNT__ __STANDINGS__ __ROUNDS__ __PLAYERS_DATE__ __TABLE_DATE__ __SEASON_START__` |
 | `scripts/update.py` | `players` / `standings` fetch from the Thai League API, then build `index.html`; `build` only rebuilds |
 | `data/players.json` | Generated each night. Fields: `id c p t k n th by g m mv fr y` |
-| `data/overrides.json` | Hand-made, keyed by Thai League player id: `n` (English display name), `th` (Thai spelling for foreigners), `mv`/`fr` (0 stayed, 1 moved from `fr`, 3 loan from `fr`; 2 = unknown) |
+| `data/overrides.json` | Hand-made, keyed by Thai League player id: `n` (English display name), `th` (Thai spelling for foreigners), `mv`/`fr` (0 stayed, 1 moved from `fr` (no `fr` = was without a club), 3 loan from `fr`, 4 back from a loan at `fr`; 2 = unknown) |
 | `data/standings.json`, `data/meta.json` | League ranks + rounds played; last player update date |
 | `scripts/playtest.py` | Headless play-through; must PASS before every push |
 | `scripts/make_og.py` | Draws `og.png` (1200x630 link preview); rerun when the look or season text changes |
@@ -68,8 +68,15 @@ Python's http.server can't start inside ~/Documents from the app, so use the Nod
 - Transfer clue order: `overrides.json` > API loan field > official transfer list
   (`team-transactions-public`, same data as thaileague.co.th/transfers/224) > unknown (`mv: 2`).
   Only transfer-list arrivals that name a source club count: "No Club" also covers contract renewals.
-  That list holds national ID numbers: never save it raw. About 160 mystery-pool players are still
-  unknown; last season's rosters in the API (207 T1 / 208 T2) are emptied, so only hand overrides help.
+  That list holds national ID numbers: never save it raw.
+- Nov 2026: transfer info for ~120 players was filled from Transfermarkt squad pages ("Joined" date +
+  "Signed from"; joined before June 2026 = stayed). Thai clubs are written with their official Thai
+  name from the API; foreign clubs keep their English name. ~40 pool players (mostly academy kids
+  not on Transfermarkt) are still `mv: 2`.
+- Foreign players' Thai names (`th` in overrides): the owner wants the spelling Thai media and club
+  pages use (e.g. "เปาลินโญ่", "นาธาน เปไล"), NOT Thai Wikipedia's Royal Institute spelling. Only 23 of
+  160 were checked against Google results in Nov 2026 (BRU, BGP and two POR); the rest are unverified.
+  Bulk automated Google searching is blocked as bot-check circumvention: check names one by one.
 - New season: update `TOURNAMENT`, `SEASON_START` and `TEAMS` in `scripts/update.py`, rerun `make_og.py`, `STANDINGS` placeholder data,
   the season text in the template, and check club codes/regions in the template's `CLUBS`.
 - Commit messages in English; the bot's daily "Auto-update" commits are expected.
