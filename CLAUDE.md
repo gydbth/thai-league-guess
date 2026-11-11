@@ -16,8 +16,9 @@ reply in Thai, keep it short, and talk about results rather than process.
   (green = match, yellow = close, arrows on shirt number).
 - Clues on the board: 2 at the start, +1 after 3 wrong guesses, +1 after 6.
   **Clues must never repeat a tile fact** (no region, position, nationality or shirt number).
-  Allowed: transfer/loan/stayed, age, appearances, goals (no league-table clue: the owner removed it);
-  if a player has fewer than 3 of these, the surname's first letter fills in. The 4th clue is
+  Allowed: transfer/loan/stayed and age only. No season stats (appearances, goals, league rank): the owner
+  wants nothing that changes week to week;
+  the 3rd clue is the surname's first letter (English initial pads thin data). The 4th clue is
   always the first letter of the Thai name (for a leading vowel เ แ โ ใ ไ it shows vowel + consonant, e.g. "เป…").
 - Search accepts Thai or English; matching ignores Thai tone marks and Latin accents.
 - Stats (win streak, best streak) live in the player's localStorage only.

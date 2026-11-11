@@ -399,23 +399,19 @@ const EASY_MIN = Math.max(1, Math.ceil(ROUNDS_PLAYED/2));
 const EASY_POOL = POOL.filter(p=>p.m>=EASY_MIN);
 // Clue deck for one player: 2 shown at the start, a 3rd after 3 wrong guesses, a 4th after 6
 function buildClues(p){
-  // Clues only use facts that are NOT one of the five guess tiles (club, region, position, nationality, shirt number)
-  const easy = [], other = [];
-  if(p.mv===1) easy.push(p.fr ? `<b>เพิ่งย้ายมา</b>ฤดูกาลนี้ จาก ${esc(p.fr)}` : `<b>เพิ่งย้ายมา</b>ฤดูกาลนี้ (ไม่มีสังกัดก่อนหน้า)`);
-  else if(p.mv===3) easy.push(`<b>ยืมตัว</b>มาจาก ${esc(p.fr)}`);
-  else if(p.mv===4) easy.push(`<b>กลับจากถูกปล่อยยืม</b>ให้ ${esc(p.fr)}`);
-  else if(p.mv===0) other.push(`อยู่กับทีมมา<b>ตั้งแต่ฤดูกาลที่แล้ว</b>`);
-  if(p.by) other.push(`อายุราว <b>${SEASON_START-p.by}</b> ปี`);
-  if(p.m===0) other.push(`<b>ยังไม่ได้ลงเล่น</b>ในลีกฤดูกาลนี้`);
-  else other.push(`ลงเล่นในลีกไปแล้ว <b>${p.m}</b> จาก ${ROUNDS_PLAYED} นัด`);
-  if(p.g>0) easy.push(`ยิงไปแล้ว <b>${p.g}</b> ประตูในลีกฤดูกาลนี้`);
-  else if(p.m>0) other.push(`ยัง<b>ไม่มีประตู</b>ในลีกฤดูกาลนี้`);
-  const shuffle = a => { for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; };
-  shuffle(easy); shuffle(other);
-  // alternate hard/easy for the first three; the fourth (after 6 wrong guesses) is always the first letter of the name
-  const deck=[]; while(easy.length||other.length){ if(other.length) deck.push(other.shift()); if(easy.length) deck.push(easy.shift()); }
-  // players with little data (no transfer info, no games) still get 3 clues before the first letter
-  if(deck.length<3) deck.push(surnameClue(p));
+  // Clues only use facts that are NOT one of the five guess tiles (club, region, position, nationality, shirt number),
+  // and only facts that stay fixed for the whole season: no appearances, goals or league-table rank
+  const deck = [];
+  if(p.mv===1) deck.push(p.fr ? `<b>เพิ่งย้ายมา</b>ฤดูกาลนี้ จาก ${esc(p.fr)}` : `<b>เพิ่งย้ายมา</b>ฤดูกาลนี้ (ไม่มีสังกัดก่อนหน้า)`);
+  else if(p.mv===3) deck.push(`<b>ยืมตัว</b>มาจาก ${esc(p.fr)}`);
+  else if(p.mv===4) deck.push(`<b>กลับจากถูกปล่อยยืม</b>ให้ ${esc(p.fr)}`);
+  else if(p.mv===0) deck.push(`อยู่กับทีมมา<b>ตั้งแต่ฤดูกาลที่แล้ว</b>`);
+  if(p.by) deck.push(`อายุราว <b>${SEASON_START-p.by}</b> ปี`);
+  if(Math.random()<.5) deck.reverse();
+  // the 3rd clue (after 3 wrong guesses) is the surname's first letter; pad with the English initial if data is thin
+  deck.push(surnameClue(p));
+  const eng = `ชื่อภาษาอังกฤษขึ้นต้นด้วย <b>${esc(p.n[0].toUpperCase())}</b>`;
+  if(deck.length<3 && !deck.includes(eng)) deck.push(eng);
   return [...deck.slice(0,3), firstLetterClue(disp(p))];
 }
 // Thai leading vowels (เ แ โ ใ ไ) are written before the consonant, so "starts with เ" says almost nothing:
