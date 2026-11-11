@@ -42,8 +42,12 @@ has not played (guessable, never chosen as the mystery player).
 ```bash
 python3 scripts/update.py build          # rebuild index.html after editing the template or data
 python3 scripts/playtest.py              # must print PASS before pushing
+.venv/bin/python scripts/playtest.py     # same, on this Mac (Playwright lives in the git-ignored .venv)
 python3 scripts/make_fixtures.py /tmp/fx && python3 scripts/update.py players --api-dir /tmp/fx   # offline update test
 ```
+
+Local preview: `node .claude/serve.mjs` (launch config "thai-league-guess", port 8765). On macOS,
+Python's http.server can't start inside ~/Documents from the app, so use the Node server.
 
 ## Rules learned the hard way
 

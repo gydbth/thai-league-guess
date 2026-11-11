@@ -1,0 +1,14 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "thai-league-guess",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        ".claude/serve.mjs",
+        "8765"
+      ],
+      "port": 8765
+    }
+  ]
+}
