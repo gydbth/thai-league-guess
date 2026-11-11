@@ -16,7 +16,8 @@ reply in Thai, keep it short, and talk about results rather than process.
   (green = match, yellow = close, arrows on shirt number).
 - Clues on the board: 2 at the start, +1 after 3 wrong guesses, +1 after 6.
   **Clues must never repeat a tile fact** (no region, position, nationality or shirt number).
-  Allowed: league table band, transfer/loan/stayed, age, appearances, goals; the 4th clue is
+  Allowed: transfer/loan/stayed, age, appearances, goals (no league-table clue: the owner removed it);
+  if a player has fewer than 3 of these, the surname's first letter fills in. The 4th clue is
   always the first letter of the Thai name (for a leading vowel เ แ โ ใ ไ it shows vowel + consonant, e.g. "เป…").
 - Search accepts Thai or English; matching ignores Thai tone marks and Latin accents.
 - Stats (win streak, best streak) live in the player's localStorage only.
@@ -64,9 +65,11 @@ Python's http.server can't start inside ~/Documents from the app, so use the Nod
   If blocked, work with `--api-dir` fixtures or trigger the workflow instead of guessing data.
 - New registrations (e.g. January transfer window) appear automatically, but foreigners show their
   English name and have no transfer clue until someone adds an entry to `data/overrides.json`.
-- Transfer clue: ~170 players have `mv: 2` (unknown). Last season's rosters in the API (tournaments
-  207 T1 / 208 T2 for 2025/26) are mostly emptied once players re-register, so they cannot fill these;
-  only hand entries in `data/overrides.json` can.
+- Transfer clue order: `overrides.json` > API loan field > official transfer list
+  (`team-transactions-public`, same data as thaileague.co.th/transfers/224) > unknown (`mv: 2`).
+  Only transfer-list arrivals that name a source club count: "No Club" also covers contract renewals.
+  That list holds national ID numbers: never save it raw. About 160 mystery-pool players are still
+  unknown; last season's rosters in the API (207 T1 / 208 T2) are emptied, so only hand overrides help.
 - New season: update `TOURNAMENT`, `SEASON_START` and `TEAMS` in `scripts/update.py`, rerun `make_og.py`, `STANDINGS` placeholder data,
   the season text in the template, and check club codes/regions in the template's `CLUBS`.
 - Commit messages in English; the bot's daily "Auto-update" commits are expected.

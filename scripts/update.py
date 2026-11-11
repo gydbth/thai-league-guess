@@ -81,8 +81,30 @@ def today():
     return datetime.now(BKK).date()
 
 
+def club_th(name):
+    return re.sub(r"\s*เอฟซี$", "", re.sub(r"^สโมสรฟุตบอล\s*", "", name or "")).replace("สิงห์ ", "").strip()
+
+
+def arrivals_from_clubs():
+    """{player id: Thai name of the club he came from}, from the official transfer list.
+    Only arrivals that name a source club count: "No Club" also covers contract renewals."""
+    try:
+        teams = get(f"team-transactions-public/?tournament={TOURNAMENT}")
+    except Exception as e:  # nice to have; never block the nightly update on it
+        print(f"transfers skipped: {e}", file=sys.stderr)
+        return {}
+    out = {}
+    for t in teams:
+        for a in t.get("arrival", []):
+            for d in a.get("transaction_detail", []):
+                if d.get("type") == "Player" and d.get("source_club_name"):
+                    out[d["player_id"]] = club_th(d["source_club_name"])
+    return out
+
+
 def update_players():
     overrides = load("overrides.json", {})
+    came_from = arrivals_from_clubs()
     teams = get(f"tournament-team-public/?tournament={TOURNAMENT}")
     teams = teams.get("results", teams) if isinstance(teams, dict) else teams
     club_name = {t["club"]: re.sub(r"\s*เอฟซี$", "", t["name"]).replace("สิงห์ ", "") for t in teams}
@@ -111,6 +133,8 @@ def update_players():
                         x["fr"] = o["fr"]
                 elif p.get("loan_source_club"):
                     x["mv"], x["fr"] = 3, club_name.get(p["loan_source_club"], "สโมสรอื่น")
+                elif p["id"] in came_from:
+                    x["mv"], x["fr"] = 1, came_from[p["id"]]
                 else:
                     x["mv"] = 2
                 if m == 0 and by >= 2007:
