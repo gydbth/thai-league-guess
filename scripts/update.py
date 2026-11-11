@@ -18,6 +18,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA = os.path.join(ROOT, "data")
 API = "https://competition.tl.prod.c0d1um.io/thaileague/api/"
 TOURNAMENT = 224  # BYD Sealion 6 League I 2026/27; change for a new season
+SEASON_START = 2026  # first calendar year of the season; ages in clues count from here
 # tournament_team id -> club code used by the game (2026/27)
 TEAMS = {7112: "BRU", 7113: "BGP", 7114: "POR", 7115: "RBM", 7116: "BKU", 7117: "PTP",
          7118: "AYU", 7119: "CRU", 7120: "CHO", 7121: "RAY", 7122: "LWR", 7123: "UTT",
@@ -159,11 +160,20 @@ def build():
              .replace("__STANDINGS__", json.dumps(st["ranks"], separators=(",", ":")))
              .replace("__ROUNDS__", str(st["rounds"]))
              .replace("__PLAYERS_DATE__", d(meta.get("players_updated", st["updated"])))
-             .replace("__TABLE_DATE__", d(st["updated"])))
+             .replace("__TABLE_DATE__", d(st["updated"]))
+             .replace("__SEASON_START__", str(SEASON_START)))
     page = ('<!doctype html>\n<html lang="th">\n<head>\n<meta charset="utf-8">\n'
             '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'
             '<meta name="theme-color" content="#07100b">\n'
             '<meta name="description" content="เกมทายนักเตะไทยลีก 1 ฤดูกาล 2026/27 เล่นได้ไม่จำกัด">\n'
+            # Link preview for LINE / Facebook / X (og.png is made by scripts/make_og.py)
+            '<meta property="og:type" content="website">\n'
+            '<meta property="og:url" content="https://thai-league-guess.vercel.app/">\n'
+            '<meta property="og:title" content="ทายแข้งลีกไทย">\n'
+            '<meta property="og:description" content="ทายนักเตะไทยลีก 1 ฤดูกาล 2026/27 จากคำใบ้ สโมสร ภาค ตำแหน่ง สัญชาติ เบอร์เสื้อ ภายใน 8 ครั้ง">\n'
+            '<meta property="og:image" content="https://thai-league-guess.vercel.app/og.png">\n'
+            '<meta property="og:image:width" content="1200">\n<meta property="og:image:height" content="630">\n'
+            '<meta name="twitter:card" content="summary_large_image">\n'
             '<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}'
             'body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>\n</head>\n<body>\n'
             + body + '\n</body>\n</html>\n')

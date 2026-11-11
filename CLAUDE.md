@@ -10,26 +10,30 @@ reply in Thai, keep it short, and talk about results rather than process.
 ## How the game works
 
 - Endless mode: a random mystery player each round, 8 guesses, "เล่นคนต่อไป" starts a new round.
+- Two levels (toggle "ปกติ / ง่าย", saved in localStorage `tl-mode`): easy only picks regulars with
+  at least half of the league rounds played; it has its own stats (`tl-easy-stats`).
 - Each guess shows 5 tiles: club, region (ภาค), position, nationality, shirt number
   (green = match, yellow = close, arrows on shirt number).
 - Clues on the board: 2 at the start, +1 after 3 wrong guesses, +1 after 6.
   **Clues must never repeat a tile fact** (no region, position, nationality or shirt number).
   Allowed: league table band, transfer/loan/stayed, age, appearances, goals; the 4th clue is
-  always the first letter of the Thai name.
+  always the first letter of the Thai name (for a leading vowel เ แ โ ใ ไ it shows vowel + consonant, e.g. "เป…").
 - Search accepts Thai or English; matching ignores Thai tone marks and Latin accents.
 - Stats (win streak, best streak) live in the player's localStorage only.
+- The share text ends with the site link; `og.png` (made by `scripts/make_og.py`) is the link-preview picture.
 - Look: dark "night match" pitch, Kanit + IBM Plex Sans Thai, red give-up button with a flag.
 
 ## Files
 
 | Path | What it is |
 |---|---|
-| `scripts/game-template.html` | The game (CSS + markup + JS). Edit the game here, never in `index.html`. Placeholders: `__PLAYERS__ __COUNT__ __STANDINGS__ __ROUNDS__ __PLAYERS_DATE__ __TABLE_DATE__` |
+| `scripts/game-template.html` | The game (CSS + markup + JS). Edit the game here, never in `index.html`. Placeholders: `__PLAYERS__ __COUNT__ __STANDINGS__ __ROUNDS__ __PLAYERS_DATE__ __TABLE_DATE__ __SEASON_START__` |
 | `scripts/update.py` | `players` / `standings` fetch from the Thai League API, then build `index.html`; `build` only rebuilds |
 | `data/players.json` | Generated each night. Fields: `id c p t k n th by g m mv fr y` |
 | `data/overrides.json` | Hand-made, keyed by Thai League player id: `n` (English display name), `th` (Thai spelling for foreigners), `mv`/`fr` (0 stayed, 1 moved from `fr`, 3 loan from `fr`; 2 = unknown) |
 | `data/standings.json`, `data/meta.json` | League ranks + rounds played; last player update date |
 | `scripts/playtest.py` | Headless play-through; must PASS before every push |
+| `scripts/make_og.py` | Draws `og.png` (1200x630 link preview); rerun when the look or season text changes |
 | `scripts/make_fixtures.py` | Fake API responses from `data/` for offline runs of `update.py` |
 | `.github/workflows/update-data.yml` | Cron: players daily 23:00 Bangkok, standings Tuesday 08:00; manual "Run workflow" too |
 
@@ -60,6 +64,9 @@ Python's http.server can't start inside ~/Documents from the app, so use the Nod
   If blocked, work with `--api-dir` fixtures or trigger the workflow instead of guessing data.
 - New registrations (e.g. January transfer window) appear automatically, but foreigners show their
   English name and have no transfer clue until someone adds an entry to `data/overrides.json`.
-- New season: update `TOURNAMENT` and `TEAMS` in `scripts/update.py`, `STANDINGS` placeholder data,
+- Transfer clue: ~170 players have `mv: 2` (unknown). Last season's rosters in the API (tournaments
+  207 T1 / 208 T2 for 2025/26) are mostly emptied once players re-register, so they cannot fill these;
+  only hand entries in `data/overrides.json` can.
+- New season: update `TOURNAMENT`, `SEASON_START` and `TEAMS` in `scripts/update.py`, rerun `make_og.py`, `STANDINGS` placeholder data,
   the season text in the template, and check club codes/regions in the template's `CLUBS`.
 - Commit messages in English; the bot's daily "Auto-update" commits are expected.

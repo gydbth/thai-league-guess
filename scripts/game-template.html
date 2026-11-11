@@ -45,6 +45,9 @@ button:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid
 .status{display:flex;justify-content:space-between;align-items:center;gap:10px;font-family:var(--display);font-size:14px;color:var(--muted)}
 .status b{color:var(--ink);font-weight:500;font-variant-numeric:tabular-nums}
 .status .streak b{color:var(--lime)}
+.mode{display:inline-flex;padding:2px;border-radius:9px;background:rgba(0,0,0,.35);border:1px solid var(--card-line)}
+.mode button{font:500 13px var(--display);color:var(--muted);background:none;border:0;padding:4px 11px;border-radius:7px;cursor:pointer}
+.mode button[aria-pressed="true"]{background:var(--lime-deep);color:#fff}
 
 .board{position:relative;overflow:hidden;border-radius:14px;padding:16px 18px;display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center;color:var(--ink);
   background:linear-gradient(135deg,#2a6b45 0%,#1b4a30 55%,#143a25 100%);
@@ -122,6 +125,7 @@ details.help summary{cursor:pointer;font-family:var(--display);font-weight:500}
 
   <div class="status" aria-live="polite">
     <span class="streak">ชนะติดกัน <b id="streakNo">0</b></span>
+    <span class="mode" role="group" aria-label="ระดับความยาก"><button type="button" data-mode="normal">ปกติ</button><button type="button" data-mode="easy">ง่าย</button></span>
     <span>สถิติสูงสุด <b id="bestNo">0</b></span>
   </div>
 
@@ -157,6 +161,7 @@ details.help summary{cursor:pointer;font-family:var(--display);font-weight:500}
       <div><i style="background:var(--hit)"></i>เขียว: ตรงกับนักเตะปริศนา</div>
       <div><i style="background:var(--near)"></i>เหลือง: ใกล้แล้ว สโมสรอยู่จังหวัดเดียวกัน · ตำแหน่งติดกัน · สัญชาติทวีปเดียวกัน · เบอร์ห่างไม่เกิน 3</div>
       <div><i style="background:var(--miss);border:1px solid var(--card-line)"></i>เทา: ไม่ตรง ลูกศร ↑ ↓ บอกว่าเบอร์เสื้อมากหรือน้อยกว่า</div>
+      <div>โหมดง่าย: สุ่มเฉพาะตัวหลักที่ลงเล่นในลีกอย่างน้อยครึ่งหนึ่งของนัดที่แข่งไปแล้ว นับสถิติแยกจากโหมดปกติ</div>
       <div>ทายจบแล้วกด "เล่นคนต่อไป" หรือ Enter เพื่อสุ่มนักเตะคนใหม่ เล่นได้ไม่จำกัด</div>
     </div>
   </details>
@@ -298,12 +303,14 @@ function finish(won){
   setTimeout(showEnd, guesses.length?450:0);
 }
 
-const STATS_KEY="tl-endless-stats";
-function getStats(){return store.get(STATS_KEY,{played:0,wins:0,streak:0,best:0});}
+// Easy and normal mode keep separate stats so an easy streak never inflates the normal one
+let easy = store.get("tl-mode","normal")==="easy";
+const statsKey = () => easy ? "tl-easy-stats" : "tl-endless-stats";
+function getStats(){return store.get(statsKey(),{played:0,wins:0,streak:0,best:0});}
 function recordStats(won){
   const s = getStats();
   s.played++; if(won){ s.wins++; s.streak++; s.best=Math.max(s.best,s.streak);} else s.streak=0;
-  statsCache=s; store.set(STATS_KEY,s);
+  statsCache=s; store.set(statsKey(),s);
 }
 let statsCache=null;
 const _get=getStats; getStats=()=>statsCache||(statsCache=_get());
@@ -312,7 +319,7 @@ function shareText(){
   const won = guesses.some(g=>g.id===secret.id);
   const sq={hit:"🟩",near:"🟨",miss:"⬜"};
   const lines = guesses.map(g=>{const r=compare(g,secret);return [r.club,r.reg,r.pos,r.nat,r.num].map(x=>sq[x]).join("");});
-  return `ทายแข้งลีกไทย ${won?guesses.length:"X"}/${MAX}\n${lines.join("\n")}`;
+  return `ทายแข้งลีกไทย ${won?guesses.length:"X"}/${MAX}${easy?" (โหมดง่าย)":""}\n${lines.join("\n")}\n${SITE_URL}`;
 }
 
 function showEnd(){
@@ -367,6 +374,11 @@ document.addEventListener("click",e=>{if(!e.target.closest(".search"))closeList(
 // League table snapshot used for the "team position" clue (thaileague.co.th, after 5 rounds)
 const STANDINGS = __STANDINGS__;
 const ROUNDS_PLAYED = __ROUNDS__;
+const SEASON_START = __SEASON_START__; // first calendar year of the season (set in update.py)
+const SITE_URL = "https://thai-league-guess.vercel.app";
+// Easy mode only picks regulars: played at least half of the league rounds so far
+const EASY_MIN = Math.max(1, Math.ceil(ROUNDS_PLAYED/2));
+const EASY_POOL = POOL.filter(p=>p.m>=EASY_MIN);
 // Clue deck for one player: 2 shown at the start, a 3rd after 3 wrong guesses, a 4th after 6
 function buildClues(p){
   // Clues only use facts that are NOT one of the five guess tiles (club, region, position, nationality, shirt number)
@@ -376,7 +388,7 @@ function buildClues(p){
   if(p.mv===1) easy.push(`<b>เพิ่งย้ายมา</b>ฤดูกาลนี้ จาก ${esc(p.fr)}`);
   else if(p.mv===3) easy.push(`<b>ยืมตัว</b>มาจาก ${esc(p.fr)}`);
   else if(p.mv===0) other.push(`อยู่กับทีมมา<b>ตั้งแต่ฤดูกาลที่แล้ว</b>`);
-  if(p.by) other.push(`อายุราว <b>${2026-p.by}</b> ปี`);
+  if(p.by) other.push(`อายุราว <b>${SEASON_START-p.by}</b> ปี`);
   if(p.m===0) other.push(`<b>ยังไม่ได้ลงเล่น</b>ในลีกฤดูกาลนี้`);
   else other.push(`ลงเล่นในลีกไปแล้ว <b>${p.m}</b> จาก ${ROUNDS_PLAYED} นัด`);
   if(p.g>0) easy.push(`ยิงไปแล้ว <b>${p.g}</b> ประตูในลีกฤดูกาลนี้`);
@@ -385,8 +397,13 @@ function buildClues(p){
   shuffle(easy); shuffle(other);
   // alternate hard/easy for the first three; the fourth (after 6 wrong guesses) is always the first letter of the name
   const deck=[]; while(easy.length||other.length){ if(other.length) deck.push(other.shift()); if(easy.length) deck.push(easy.shift()); }
-  const name = disp(p);
-  return [...deck.slice(0,3), `ชื่อขึ้นต้นด้วย <b>${esc(name[0])}</b>`];
+  return [...deck.slice(0,3), firstLetterClue(disp(p))];
+}
+// Thai leading vowels (เ แ โ ใ ไ) are written before the consonant, so "starts with เ" says almost nothing:
+// show the vowel together with the first consonant instead
+function firstLetterClue(name){
+  const m = name.match(/^[เแโใไ][ก-ฮ]/);
+  return `ชื่อขึ้นต้นด้วย <b>${esc(m ? m[0]+"…" : name[0])}</b>`;
 }
 let roundClues = [], lastShown = 0;
 function cluesShown(){
@@ -395,7 +412,8 @@ function cluesShown(){
 }
 function newRound(){
   // avoid repeating any of the last 50 secrets
-  let p; do { p = POOL[Math.floor(Math.random()*POOL.length)]; } while(recent.includes(p.id) && recent.length < POOL.length);
+  const pool = easy && EASY_POOL.length >= 20 ? EASY_POOL : POOL;
+  let p; do { p = pool[Math.floor(Math.random()*pool.length)]; } while(recent.includes(p.id) && recent.length < pool.length);
   recent.push(p.id); if(recent.length>50) recent.shift();
   secret=p; guesses=[]; done=false; round++;
   roundClues = buildClues(p); lastShown = 0;
@@ -403,6 +421,15 @@ function newRound(){
   render(); input.focus();
 }
 $("giveUp").onclick=()=>{ if(!done) finish(false); };
+function paintMode(){document.querySelectorAll(".mode button").forEach(b=>b.setAttribute("aria-pressed",String((b.dataset.mode==="easy")===easy)));}
+document.querySelectorAll(".mode button").forEach(b=>b.onclick=()=>{
+  const want = b.dataset.mode==="easy";
+  if(want===easy) return;
+  easy = want; store.set("tl-mode", easy?"easy":"normal"); statsCache=null; paintMode();
+  toast(easy?"โหมดง่าย: สุ่มเฉพาะตัวหลัก":"โหมดปกติ: สุ่มจากทุกคน");
+  newRound();
+});
+paintMode();
 // Enter starts the next round, unless it's aimed at an input or a button (those handle it themselves)
 document.addEventListener("keydown",e=>{ if(done && e.key==="Enter" && !e.target.closest("input,button")){ e.preventDefault(); newRound(); }});
 $("dataNote").textContent=DATA_NOTE;
