@@ -74,6 +74,10 @@ Python's http.server can't start inside ~/Documents from the app, so use the Nod
   "Signed from"; joined before June 2026 = stayed). Thai clubs are written with their official Thai
   name from the API; foreign clubs keep their English name. ~40 pool players (mostly academy kids
   not on Transfermarkt) are still `mv: 2`.
+- Nov 12 2026: the ~300 "stayed" (`mv: 0`) entries that came with the original overrides file were
+  stale (left over from an earlier season); ~100 were wrong. All were re-checked against the
+  Transfermarkt 2026 squad pages (match by club + birth year + name). Players not on Transfermarkt
+  now get `mv: 2` (no transfer clue) rather than a guessed "stayed". Never mark `mv: 0` without a source.
 - Foreign players' Thai names (`th` in overrides): the owner wants the spelling Thai media and club
   pages use (e.g. "เปาลินโญ่", "นาธาน เปไล"), NOT Thai Wikipedia's Royal Institute spelling. All 160 were
   checked against Google results team by team in Nov 2026 (80 changed). About 11 rest on only 1-2 hits

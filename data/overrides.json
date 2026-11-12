@@ -67,7 +67,8 @@
 "n": "Phanthamit Praphanth"
 },
 "14982": {
-"mv": 0,
+"fr": "บุรีรัมย์ ยูไนเต็ด",
+"mv": 1,
 "n": "Leon Pitchaya James"
 },
 "14984": {
@@ -75,7 +76,8 @@
 "n": "Phuwadol Pholsongkram"
 },
 "15155": {
-"mv": 0,
+"fr": "พลังกาญจน์",
+"mv": 1,
 "n": "Natthasan Pakkarano"
 },
 "15156": {
@@ -93,7 +95,8 @@
 "n": "Adam Lassamano"
 },
 "15325": {
-"mv": 0,
+"fr": "บางกอก",
+"mv": 1,
 "n": "Deyvison Fernandes",
 "th": "เดย์วิสัน เฟอร์นานเดซ"
 },
@@ -110,7 +113,8 @@
 "th": "เวลลิงตัน พริออรี่"
 },
 "15450": {
-"mv": 0,
+"fr": "เมืองทอง ยูไนเต็ด",
+"mv": 1,
 "n": "Willian Popp",
 "th": "วิลเลียน พ็อพพ์"
 },
@@ -181,7 +185,7 @@
 "n": "Chutikom Klinjumpasri"
 },
 "1617": {
-"mv": 0,
+"mv": 2,
 "n": "Sakkarawit Nimma"
 },
 "16780": {
@@ -203,7 +207,8 @@
 "n": "Sittha Boonlha"
 },
 "17086": {
-"mv": 0,
+"fr": "เมืองทอง ยูไนเต็ด",
+"mv": 1,
 "n": "Kakana Khamyok"
 },
 "17171": {
@@ -269,7 +274,7 @@
 "n": "Wachirawut Saenchek"
 },
 "18507": {
-"mv": 0,
+"mv": 2,
 "n": "Witthawat Phraothaisong"
 },
 "18824": {
@@ -289,11 +294,12 @@
 "n": "Peeradol Chamrasamee"
 },
 "1929": {
-"mv": 0,
+"mv": 2,
 "n": "Thiraphon Yoyoei"
 },
 "1930": {
-"mv": 0,
+"fr": "Selangor FC",
+"mv": 1,
 "n": "Picha Autra"
 },
 "1937": {
@@ -306,7 +312,8 @@
 "n": "Yotsakorn Burapha"
 },
 "1939": {
-"mv": 0,
+"fr": "ทรู แบงค็อก ยูไนเต็ด",
+"mv": 1,
 "n": "Jakkapan Praisuwan"
 },
 "1940": {
@@ -344,7 +351,8 @@
 "n": "Nawaphon Onsaart"
 },
 "20172": {
-"mv": 0,
+"fr": "การท่าเรือ",
+"mv": 3,
 "n": "Pichitchai Sienkrathok"
 },
 "20437": {
@@ -487,11 +495,11 @@
 "n": "Chayadol A-Tit"
 },
 "26825": {
-"mv": 0,
+"mv": 2,
 "n": "Pachara Wangsawat"
 },
 "26828": {
-"mv": 0,
+"mv": 2,
 "n": "Achita Nawathit"
 },
 "26834": {
@@ -516,11 +524,11 @@
 "n": "Supanut Sudathip"
 },
 "26875": {
-"mv": 0,
+"mv": 2,
 "n": "Aekkarat Sansuwan"
 },
 "26884": {
-"mv": 0,
+"mv": 2,
 "n": "Nontapat Ploymee"
 },
 "26895": {
@@ -563,7 +571,7 @@
 "n": "Thasuchon Sailada"
 },
 "27748": {
-"mv": 0,
+"mv": 2,
 "n": "Tanakon Pinkaew"
 },
 "2836": {
@@ -580,7 +588,7 @@
 "n": "Apison Wanchiam"
 },
 "29216": {
-"mv": 0,
+"mv": 2,
 "n": "Chanasorn Kaewyos"
 },
 "29231": {
@@ -605,7 +613,8 @@
 "n": "Pongpan Pongwarin"
 },
 "29479": {
-"mv": 0,
+"fr": "พีที ประจวบ",
+"mv": 1,
 "n": "Iklas Sanron"
 },
 "29492": {
@@ -648,7 +657,7 @@
 "n": "Sirassawut Wongruankhum"
 },
 "29533": {
-"mv": 0,
+"mv": 2,
 "n": "Prapot Chongcharoen"
 },
 "29543": {
@@ -670,7 +679,7 @@
 "n": "Phumworraphon Wannabutr"
 },
 "29611": {
-"mv": 0,
+"mv": 2,
 "n": "Sawich Klaithin"
 },
 "29749": {
@@ -696,11 +705,13 @@
 "n": "Sila Puttasara"
 },
 "31103": {
-"mv": 0,
+"fr": "บุรีรัมย์ ยูไนเต็ด",
+"mv": 3,
 "n": "Seksan Ratree"
 },
 "31108": {
-"mv": 0,
+"fr": "บีจี ปทุม ยูไนเต็ด",
+"mv": 1,
 "n": "Thawatchai Inprakhon"
 },
 "3125": {
@@ -741,11 +752,13 @@
 "n": "Nattapat Changpipat"
 },
 "3269": {
+"mv": 0,
 "n": "Hiromichi Katano",
 "th": "ฮิโรมิชิ คาตาโนะ"
 },
 "3277": {
-"mv": 0,
+"fr": "ขอนแก่น ยูไนเต็ด",
+"mv": 1,
 "n": "Phiyawat Intarapim"
 },
 "3281": {
@@ -759,7 +772,8 @@
 "n": "Natdanai Teantong"
 },
 "3297": {
-"mv": 0,
+"fr": "นครราชสีมา มาสด้า",
+"mv": 1,
 "n": "Dennis Murillo",
 "th": "เดนนิส มูริลโล่"
 },
@@ -845,7 +859,8 @@
 "n": "Panupong Pongwarin"
 },
 "3602": {
-"mv": 0,
+"fr": "เกษตรศาสตร์",
+"mv": 1,
 "n": "Denis Darbellay"
 },
 "36072": {
@@ -876,7 +891,8 @@
 "n": "Janepob Phokhi"
 },
 "3630": {
-"mv": 0,
+"fr": "ขอนแก่น ยูไนเต็ด",
+"mv": 1,
 "n": "Parndecha Ngernprasert"
 },
 "3631": {
@@ -891,7 +907,8 @@
 "n": "Mehti Sarakham"
 },
 "3638": {
-"mv": 0,
+"fr": "บุรีรัมย์ ยูไนเต็ด",
+"mv": 3,
 "n": "Nopphon Lakhonphon"
 },
 "36483": {
@@ -914,7 +931,8 @@
 "n": "Thirapak Prueangna"
 },
 "3697": {
-"mv": 0,
+"fr": "บีจี ปทุม ยูไนเต็ด",
+"mv": 3,
 "n": "Airfan Doloh"
 },
 "37029": {
@@ -937,7 +955,7 @@
 "n": "Patihan Yodkun"
 },
 "37809": {
-"mv": 0,
+"mv": 2,
 "n": "Pichaya Chaiwarangkun"
 },
 "3783": {
@@ -985,7 +1003,8 @@
 "n": "Pathomphon Charoenrattanapirom"
 },
 "3910": {
-"mv": 0,
+"fr": "นครราชสีมา มาสด้า",
+"mv": 1,
 "n": "Anusak Jaiphet"
 },
 "3914": {
@@ -998,7 +1017,7 @@
 "n": "Natthapong Promorn"
 },
 "39368": {
-"mv": 0,
+"mv": 2,
 "n": "Narawit Intacharoen"
 },
 "39439": {
@@ -1009,7 +1028,8 @@
 "n": "Nontapat Naksawat"
 },
 "39639": {
-"mv": 0,
+"fr": "โปลิศ เทโร",
+"mv": 1,
 "n": "Abdulrahman Essadi"
 },
 "39670": {
@@ -1050,7 +1070,8 @@
 "n": "Pattarapon Suksakit"
 },
 "40013": {
-"mv": 0,
+"fr": "Hong Kong Rangers",
+"mv": 1,
 "n": "Matías Panigazzi",
 "th": "มาเทียส ปานิกัซซี่"
 },
@@ -1068,7 +1089,8 @@
 "n": "Atsadawut Changthong"
 },
 "40311": {
-"mv": 0,
+"fr": "บุรีรัมย์ ยูไนเต็ด",
+"mv": 3,
 "n": "Pongsakron Hanrattana"
 },
 "40318": {
@@ -1130,11 +1152,13 @@
 "n": "Issarapong Waewdee"
 },
 "4107": {
-"mv": 0,
+"fr": "บีจี ปทุม ยูไนเต็ด",
+"mv": 1,
 "n": "Chatmongkol Thongkiri"
 },
 "4111": {
-"mv": 0,
+"fr": "บีจี ปทุม ยูไนเต็ด",
+"mv": 1,
 "n": "Marco Ballini"
 },
 "4150": {
@@ -1150,11 +1174,13 @@
 "n": "Tanaboon Kesarat"
 },
 "4167": {
-"mv": 0,
+"fr": "ระยอง",
+"mv": 1,
 "n": "Saharat Pongsuwan"
 },
 "4173": {
-"mv": 0,
+"fr": "บีจี ปทุม ยูไนเต็ด",
+"mv": 1,
 "n": "Chaowat Veerachat"
 },
 "4174": {
@@ -1188,6 +1214,8 @@
 "n": "Thanakorn Savangnate"
 },
 "4280": {
+"fr": "จันทบุรี",
+"mv": 1,
 "n": "Jirawat Thongsaengphrao"
 },
 "42912": {
@@ -1219,7 +1247,8 @@
 "n": "Ben Davis"
 },
 "43258": {
-"mv": 0,
+"fr": "ขอนแก่น ยูไนเต็ด",
+"mv": 1,
 "n": "Kim Ji-min",
 "th": "คิม จี-มิน"
 },
@@ -1305,7 +1334,7 @@
 "n": "Nantawat Somyana"
 },
 "4456": {
-"mv": 0,
+"mv": 2,
 "n": "Kiattisak Jiamudom"
 },
 "44916": {
@@ -1339,6 +1368,8 @@
 "n": "Shinnaphat Leeaoh"
 },
 "4550": {
+"fr": "การท่าเรือ",
+"mv": 1,
 "n": "Chaiyawat Buran"
 },
 "4557": {
@@ -1378,7 +1409,7 @@
 "n": "Ruski Kade"
 },
 "46552": {
-"mv": 0,
+"mv": 2,
 "n": "Pongsakorn Buatab"
 },
 "46553": {
@@ -1436,14 +1467,14 @@
 "n": "Prachakorn Sirikhanti"
 },
 "47353": {
-"mv": 0,
+"mv": 2,
 "n": "Wathanyu Nairatsami"
 },
 "47354": {
 "n": "Burimnart Dechyoddee"
 },
 "47359": {
-"mv": 0,
+"mv": 2,
 "n": "Ratchanon Phoonpatanasab"
 },
 "47394": {
@@ -1459,7 +1490,8 @@
 "n": "Santipap Yaemsaen"
 },
 "4748": {
-"mv": 0,
+"fr": "ทรู แบงค็อก ยูไนเต็ด",
+"mv": 3,
 "n": "Passakorn Biaothungnoi"
 },
 "4750": {
@@ -1483,7 +1515,8 @@
 "n": "Chawanvis Rattanaphansak"
 },
 "4798": {
-"mv": 0,
+"fr": "เมืองทอง ยูไนเต็ด",
+"mv": 1,
 "n": "Tristan Do"
 },
 "4799": {
@@ -1491,7 +1524,8 @@
 "n": "Wisarut Imura"
 },
 "4800": {
-"mv": 0,
+"fr": "พลังกาญจน์",
+"mv": 1,
 "n": "Peerapat Notchaiya"
 },
 "4804": {
@@ -1520,11 +1554,13 @@
 "n": "Ekkachai Samre"
 },
 "4816": {
-"mv": 0,
+"fr": "ทรู แบงค็อก ยูไนเต็ด",
+"mv": 1,
 "n": "Manuel Bihr"
 },
 "4817": {
-"mv": 0,
+"fr": "จันทบุรี",
+"mv": 1,
 "n": "Putthinan Wannasri"
 },
 "4818": {
@@ -1533,7 +1569,8 @@
 "th": "เอเวอร์ตัน"
 },
 "4820": {
-"mv": 0,
+"fr": "ทรู แบงค็อก ยูไนเต็ด",
+"mv": 3,
 "n": "Anon Amornlerdsak"
 },
 "4821": {
@@ -1566,7 +1603,8 @@
 "n": "Jonathan Khemdee"
 },
 "4869": {
-"mv": 0,
+"fr": "พลังกาญจน์",
+"mv": 1,
 "n": "Pawee Tanthatemee"
 },
 "4872": {
@@ -1614,7 +1652,8 @@
 "n": "Bordin Phala"
 },
 "4972": {
-"mv": 0,
+"fr": "ขอนแก่น ยูไนเต็ด",
+"mv": 1,
 "n": "Arthit Boodjinda"
 },
 "4973": {
@@ -1623,7 +1662,8 @@
 "n": "Nitipong Selanon"
 },
 "4975": {
-"mv": 0,
+"fr": "การท่าเรือ",
+"mv": 1,
 "n": "Worawut Srisupha"
 },
 "4976": {
@@ -1678,7 +1718,8 @@
 "n": "Baworn Tapla"
 },
 "5070": {
-"mv": 0,
+"fr": "ราชบุรี",
+"mv": 1,
 "n": "Jakkaphan Kaewprom"
 },
 "5072": {
@@ -1698,7 +1739,8 @@
 "n": "Pansa Hemviboon"
 },
 "5082": {
-"mv": 0,
+"fr": "บุรีรัมย์ ยูไนเต็ด",
+"mv": 1,
 "n": "Ratthanakorn Maikami"
 },
 "5087": {
@@ -1746,12 +1788,14 @@
 "n": "Charalampos Charalampous"
 },
 "55068": {
-"mv": 0,
+"fr": "ระยอง",
+"mv": 1,
 "n": "Ryoma Ito",
 "th": "เรียวมะ อิโตะ"
 },
 "55088": {
-"mv": 0,
+"fr": "อุทัยธานี",
+"mv": 1,
 "n": "James Beresford"
 },
 "55102": {
@@ -1759,7 +1803,8 @@
 "n": "Thanawat Suengchitthawon"
 },
 "55189": {
-"mv": 0,
+"fr": "หนองบัว พิชญ",
+"mv": 1,
 "n": "Alex Mermoz",
 "th": "อเล็กซ์ เมอร์มอส"
 },
@@ -1785,7 +1830,7 @@
 "th": "ฮาร์ฮีส สจ๊วร์ต"
 },
 "56311": {
-"mv": 0,
+"mv": 2,
 "n": "Hikaru Matsui",
 "th": "ฮิคารุ มัตสึอิ"
 },
@@ -1836,7 +1881,8 @@
 "th": "เจฟเฟอร์สัน"
 },
 "56392": {
-"mv": 0,
+"fr": "อุทัยธานี",
+"mv": 1,
 "n": "Jonas Schwabe"
 },
 "56405": {
@@ -1890,7 +1936,8 @@
 "th": "ฟิลิป ไมอา"
 },
 "57070": {
-"mv": 0,
+"fr": "เมืองทอง ยูไนเต็ด",
+"mv": 1,
 "n": "Nelson Orji",
 "th": "เนลสัน ออร์จิ"
 },
@@ -1933,7 +1980,8 @@
 "th": "เอเวอร์ตัน เปเรยร่า"
 },
 "57093": {
-"mv": 0,
+"fr": "พลังกาญจน์",
+"mv": 1,
 "n": "Andros Townsend",
 "th": "แอนดรอส ทาวน์เซนด์"
 },
@@ -2015,7 +2063,7 @@
 "n": "Panawat Naowabut"
 },
 "57487": {
-"mv": 0,
+"mv": 2,
 "n": "Thanphisit Peanksikum"
 },
 "58451": {
@@ -2092,7 +2140,8 @@
 "th": "ลูคัส บาร์เรโต้"
 },
 "61980": {
-"mv": 0,
+"fr": "Johor Darul Ta'zim",
+"mv": 1,
 "n": "Daniel Ting",
 "th": "แดเนียล ติง"
 },
@@ -2103,47 +2152,56 @@
 "th": "ยูกิ คุซาโนะ"
 },
 "62376": {
-"mv": 0,
+"fr": "CD Santa Clara",
+"mv": 1,
 "n": "Darlan Mendes",
 "th": "ดาร์ลัน เมนเดส"
 },
 "62378": {
-"mv": 0,
+"fr": "1.FC Heidenheim 1846",
+"mv": 1,
 "n": "Stefan Schimmer",
 "th": "สเตฟาน ชิมเมอร์"
 },
 "62381": {
-"mv": 0,
+"fr": "Real Zaragoza",
+"mv": 1,
 "n": "Sebas Moyano",
 "th": "เซบาส โมยาโน"
 },
 "62382": {
-"mv": 0,
+"fr": "Al-Orooba FC",
+"mv": 1,
 "n": "Paulinho",
 "th": "เปาลินโญ่"
 },
 "62383": {
-"mv": 0,
+"fr": "América Futebol Clube (MG)",
+"mv": 1,
 "n": "Nathan Pelae",
 "th": "นาธาน เปไล"
 },
 "62384": {
-"mv": 0,
+"fr": "FC Nantes",
+"mv": 1,
 "n": "Uroš Radaković",
 "th": "อูรอส ราดาโควิช"
 },
 "62385": {
-"mv": 0,
+"fr": "Hapoel Petah Tikva",
+"mv": 1,
 "n": "Yonatan Cohen",
 "th": "โยนาธาน โคเฮน"
 },
 "62386": {
-"mv": 0,
+"fr": "Macarthur FC",
+"mv": 1,
 "n": "Anthony Caceres",
 "th": "แอนโธนี คาเซเรส"
 },
 "62387": {
-"mv": 0,
+"fr": "Araz-Nakhchivan PFK",
+"mv": 1,
 "n": "Felipe Santos",
 "th": "เฟลิเป้ ซานโตส"
 },
@@ -2172,12 +2230,14 @@
 "n": "Pasqual Verkamp"
 },
 "62396": {
-"mv": 0,
+"fr": "Panionios FC",
+"mv": 1,
 "n": "Anthony Belmonte",
 "th": "อ็องโตนี เบลมงต์"
 },
 "62397": {
-"mv": 0,
+"fr": "Omonia Aradippou",
+"mv": 1,
 "n": "Ryan Edwards",
 "th": "ไรอัน เอ็ดเวิร์ดส์"
 },
@@ -2188,17 +2248,20 @@
 "th": "ฟาบิโอ คอฟมันน์"
 },
 "62400": {
-"mv": 0,
+"fr": "FK Macva Sabac",
+"mv": 1,
 "n": "Marko Nikolić",
 "th": "มาร์โก นิโคลิช"
 },
 "62401": {
-"mv": 0,
+"fr": "Betim Futebol",
+"mv": 1,
 "n": "João Magno",
 "th": "ชูเอา มักโน"
 },
 "62402": {
-"mv": 0,
+"fr": "FK Zeljeznicar Sarajevo",
+"mv": 1,
 "n": "Edin Osmanović",
 "th": "เอดิน ออสมาโนวิช"
 },
@@ -2233,7 +2296,8 @@
 "th": "ปาโบล ดิอาส"
 },
 "62410": {
-"mv": 0,
+"fr": "Persebaya Surabaya",
+"mv": 1,
 "n": "Bruno Moreira",
 "th": "บรูโน โมเรรา"
 },
@@ -2250,12 +2314,13 @@
 "th": "มาร์เซล สกาเลเซ"
 },
 "62413": {
-"mv": 0,
+"mv": 2,
 "n": "Issam Al-Sabhi",
 "th": "เอสซัม อัล ซูบี"
 },
 "62415": {
-"mv": 0,
+"fr": "Al-Shorta SC",
+"mv": 1,
 "n": "Tarek Aggoun",
 "th": "ทาเร็ก แอกกูน"
 },
@@ -2266,7 +2331,7 @@
 "th": "บรูโน่ เมนเดส"
 },
 "62417": {
-"mv": 0,
+"mv": 2,
 "n": "Jonathan Viera",
 "th": "โจนาธาน วิเอร่า"
 },
@@ -2318,17 +2383,20 @@
 "th": "มูริโล่"
 },
 "62484": {
-"mv": 0,
+"fr": "Burgan SC",
+"mv": 1,
 "n": "Mahamadou Doucouré",
 "th": "มาฮามาดู ดูกูเร"
 },
 "62485": {
-"mv": 0,
+"fr": "FC Cascavel",
+"mv": 1,
 "n": "Guilherme Borech",
 "th": "กีแยร์เม โบเรช"
 },
 "62487": {
-"mv": 0,
+"fr": "Tai Po",
+"mv": 1,
 "n": "Patrick Valverde",
 "th": "ปาทริก วัลเวอร์เด"
 },
@@ -2339,12 +2407,14 @@
 "th": "เจฟินโญ่"
 },
 "62489": {
-"mv": 0,
+"fr": "FC Andorra",
+"mv": 1,
 "n": "Marc Cardona",
 "th": "มาร์ก คาร์โดน่า"
 },
 "62490": {
-"mv": 0,
+"fr": "Grimsby Town",
+"mv": 1,
 "n": "Jude Soonsup-Bell"
 },
 "62492": {
@@ -2354,6 +2424,8 @@
 "th": "ไทล์สัน"
 },
 "62493": {
+"fr": "HSK Posusje",
+"mv": 1,
 "n": "Dejan Kerkez",
 "th": "เดยัน เคอร์เคซ"
 },
@@ -2424,7 +2496,8 @@
 "th": "กาเบรียล เดวิส"
 },
 "62506": {
-"mv": 0,
+"fr": "US Affrico",
+"mv": 1,
 "n": "Ricardo Cardoso",
 "th": "ริคาร์โด้ คาร์โดโซ่"
 },
@@ -2441,7 +2514,8 @@
 "th": "คริสเตียน อิลิชิก"
 },
 "62509": {
-"mv": 0,
+"fr": "First Vienna FC",
+"mv": 1,
 "n": "Osarenren Okungbowa",
 "th": "โอซาเรนเรน โอคุงโบวา"
 },
@@ -2457,7 +2531,8 @@
 "n": "Aymen Thiangkham"
 },
 "62513": {
-"mv": 0,
+"fr": "Jamshedpur FC",
+"mv": 1,
 "n": "Rei Tachikawa",
 "th": "เร ทาจิกาวะ"
 },
@@ -2498,7 +2573,7 @@
 "th": "คริสเตียน มาเกอรูซาน"
 },
 "62543": {
-"mv": 0,
+"mv": 2,
 "n": "Yeo Hong-gyu",
 "th": "ยอ ฮง-กยู"
 },
@@ -2515,6 +2590,8 @@
 "th": "ดิโอโก้ บริโต้"
 },
 "62560": {
+"fr": "Centro Sportivo Alagoano",
+"mv": 1,
 "n": "Wanderson Papaterra",
 "th": "วันเดอร์สัน ปาปาเตร์รา"
 },
@@ -2551,7 +2628,8 @@
 "n": "Tachin Yeewangkong"
 },
 "62667": {
-"mv": 0,
+"fr": "South Island United FC",
+"mv": 1,
 "n": "Steven van Dijk",
 "th": "สตีเวน ฟาน ไดจ์ค"
 },
@@ -2614,10 +2692,13 @@
 "n": "Nuttee Noiwilai"
 },
 "6680": {
-"mv": 0,
+"fr": "เมืองทอง ยูไนเต็ด",
+"mv": 1,
 "n": "Sorawit Panthong"
 },
 "7063": {
+"fr": "ขอนแก่น ยูไนเต็ด",
+"mv": 1,
 "n": "Siriwat Ingkaew"
 },
 "7071": {
@@ -2643,7 +2724,8 @@
 "th": "ไกเก เลเมส"
 },
 "7355": {
-"mv": 0,
+"fr": "ตราด",
+"mv": 1,
 "n": "Rodrigo Maranhão",
 "th": "โรดริโก มารันเยา"
 },
@@ -2661,7 +2743,8 @@
 "n": "Phiraphat Khamphaeng"
 },
 "7453": {
-"mv": 0,
+"fr": "เชียงราย ยูไนเต็ด",
+"mv": 1,
 "n": "Sittichok Kannoo"
 },
 "7606": {
