@@ -29,7 +29,7 @@ reply in Thai, keep it short, and talk about results rather than process.
 
 | Path | What it is |
 |---|---|
-| `scripts/game-template.html` | The game (CSS + markup + JS). Edit the game here, never in `index.html`. Placeholders: `__PLAYERS__ __COUNT__ __STANDINGS__ __ROUNDS__ __PLAYERS_DATE__ __TABLE_DATE__ __SEASON_START__` |
+| `scripts/game-template.html` | The game (CSS + markup + JS). Edit the game here, never in `index.html`. Placeholders: `__PLAYERS__ __COUNT__ __STANDINGS__ __ROUNDS__ __PLAYERS_DATE__ __SEASON_START__` (`__TABLE_DATE__` is no longer used; update.py still replaces it harmlessly) |
 | `scripts/update.py` | `players` / `standings` fetch from the Thai League API, then build `index.html`; `build` only rebuilds |
 | `data/players.json` | Generated each night. Fields: `id c p t k n th by g m mv fr y` |
 | `data/overrides.json` | Hand-made, keyed by Thai League player id: `n` (English display name), `th` (Thai spelling for foreigners), `mv`/`fr` (0 stayed, 1 moved from `fr` (no `fr` = was without a club), 3 loan from `fr`, 4 back from a loan at `fr`; 2 = unknown) |
